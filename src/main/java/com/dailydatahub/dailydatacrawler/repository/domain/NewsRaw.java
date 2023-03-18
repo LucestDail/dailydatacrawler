@@ -41,14 +41,12 @@ public class NewsRaw extends BaseTimeEntity {
 	private LocalDateTime newsDt;
 
 	@Builder
-	public NewsRaw(Long id, String title, String contents, String contentsRaw, String NewsWriter, String saveId) {
+	public NewsRaw(Long id, String title, String contents, String contentsRaw, String newsWriter, LocalDateTime newsDt) {
 		this.id = id;
 		this.title = title;
-		this.id = id;
-		this.title = title;
-		this.description = description;
-		this.saveTeam = saveTeam;
-		this.saveName = saveName;
-		this.saveId = saveId;
+		this.contents = contents;
+		this.contentsRaw = contentsRaw;
+		this.newsWriter = newsWriter;
+		this.newsDt = newsDt;
 	}
 }
