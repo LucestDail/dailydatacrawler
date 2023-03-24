@@ -23,8 +23,22 @@ public class SeleniumComponent {
     private static String SELENIUM_PATH_LINUX = "external/selenium/chromedriver_linux64/chromedriver";
     private static String SELENIUM_PATH_WINDOWS = "external/selenium/chromedriver_win32/chromedriver.exe";
     private WebDriver driver;
+    private ChromeOptions options;
 
     public SeleniumComponent() {
+        options = new ChromeOptions();
+        options.addArguments("--lang=ko");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.setCapability("ignoreProtectedModeSettings", true);
+        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--headless=new");
+        driver = new ChromeDriver(options);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
+        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
         try {
             InputStream inputStream = new ClassPathResource(SELENIUM_PATH_JENKINS).getInputStream();
             File file = File.createTempFile("chromedriver", "");
@@ -37,18 +51,6 @@ public class SeleniumComponent {
             file.setExecutable(true, false);
             file.setWritable(true, false);
             System.setProperty(SELENIUM_ID, file.getPath());
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--lang=ko");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--disable-gpu");
-            options.setCapability("ignoreProtectedModeSettings", true);
-            options.addArguments("--remote-allow-origins=*");
-            driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
-            driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
         } catch (Exception eA) {
             // eA.printStackTrace();
            System.out.println("jenkins failed");
@@ -64,18 +66,6 @@ public class SeleniumComponent {
                 file.setExecutable(true, false);
                 file.setWritable(true, false);
                 System.setProperty(SELENIUM_ID, file.getPath());
-                ChromeOptions options = new ChromeOptions();
-                options.addArguments("--lang=ko");
-                options.addArguments("--no-sandbox");
-                options.addArguments("--disable-dev-shm-usage");
-                options.addArguments("--disable-gpu");
-                options.setCapability("ignoreProtectedModeSettings", true);
-                options.addArguments("--remote-allow-origins=*");
-                driver = new ChromeDriver(options);
-                driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-                driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-                driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
-                driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
             } catch (Exception eB) {
                 // eB.printStackTrace();
                 System.out.println("linux failed");
@@ -91,18 +81,6 @@ public class SeleniumComponent {
                     file.setExecutable(true, false);
                     file.setWritable(true, false);
                     System.setProperty(SELENIUM_ID, file.getPath());
-                    ChromeOptions options = new ChromeOptions();
-                    options.addArguments("--lang=ko");
-                    options.addArguments("--no-sandbox");
-                    options.addArguments("--disable-dev-shm-usage");
-                    options.addArguments("--disable-gpu");
-                    options.setCapability("ignoreProtectedModeSettings", true);
-                    options.addArguments("--remote-allow-origins=*");
-                    driver = new ChromeDriver(options);
-                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-                    driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
-                    driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
                 } catch (Exception eC) {
                     // eC.printStackTrace();
                     System.out.println("window failed");
@@ -118,18 +96,6 @@ public class SeleniumComponent {
                         file.setExecutable(true, false);
                         file.setWritable(true, false);
                         System.setProperty(SELENIUM_ID, file.getPath());
-                        ChromeOptions options = new ChromeOptions();
-                        options.addArguments("--lang=ko");
-                        options.addArguments("--no-sandbox");
-                        options.addArguments("--disable-dev-shm-usage");
-                        options.addArguments("--disable-gpu");
-                        options.setCapability("ignoreProtectedModeSettings", true);
-                        options.addArguments("--remote-allow-origins=*");
-                        driver = new ChromeDriver(options);
-                        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-                        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-                        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
-                        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
                     } catch (Exception eD) {
                         // eD.printStackTrace();
                         System.out.println("mac failed");
@@ -145,17 +111,6 @@ public class SeleniumComponent {
                             file.setExecutable(true, false);
                             file.setWritable(true, false);
                             System.setProperty(SELENIUM_ID, file.getPath());
-                            ChromeOptions options = new ChromeOptions();
-                            options.addArguments("--lang=ko");
-                            options.addArguments("--no-sandbox");
-                            options.addArguments("--disable-dev-shm-usage");
-                            options.addArguments("--disable-gpu");
-                            options.setCapability("ignoreProtectedModeSettings", true);
-                            options.addArguments("--remote-allow-origins=*");
-                            driver = new ChromeDriver(options);
-                            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-                            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
-                            driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
                         }catch(Exception eF){
                             // eF.printStackTrace();
                             System.out.println("mac 64 failed");

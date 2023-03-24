@@ -1,4 +1,4 @@
-package com.dailydatahub.dailydatacrawler.repository.domain;
+package com.dailydatahub.dailydatacrawler.selenium.dao;
 
 import java.util.Map;
 
