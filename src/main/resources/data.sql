@@ -1,0 +1,15 @@
+INSERT INTO domain_raw (domain_code, title, contents, contents_raw, contents_writer, contents_dt, create_dt, update_dt) VALUES
+  ('001', 'test contents title 1', 'test contents 1', 'test contents raw 1', 'osh', '20230401000000', now(), now()),
+  ('001', 'test contents title 2', 'test contents 2', 'test contents raw 2', 'osh', '20230401000000', now(), now()),
+  ('002', 'test contents title 3', 'test contents 3', 'test contents raw 3', 'osh', '20230401000000', now(), now()),
+  ('002', 'test contents title 4', 'test contents 4', 'test contents raw 4', 'osh', '20230401000000', now(), now()),
+  ('003', 'test contents title 5', 'test contents 5', 'test contents raw 5', 'osh', '20230401000000', now(), now()),
+  ('003', 'test contents title 6', 'test contents 6', 'test contents raw 6', 'osh', '20230401000000', now(), now()),
+  ('004', 'test contents title 7', 'test contents 7', 'test contents raw 7', 'osh', '20230401000000', now(), now()),
+  ('004', 'test contents title 8', 'test contents 8', 'test contents raw 8', 'osh', '20230401000000', now(), now()),
+  ('005', 'test contents title 9', 'test contents 9', 'test contents raw 9', 'osh', '20230401000000', now(), now()),
+  ('006', 'test contents title 10', 'test contents 10', 'test contents raw 10', 'osh', '20230401000000', now(), now()),
+  ('007', 'test contents title 11', 'test contents 11', 'test contents raw 11', 'osh', '20230401000000', now(), now()),
+  ('008', 'test contents title 12', 'test contents 12', 'test contents raw 12', 'osh', '20230401000000', now(), now()),
+  ('009', 'test contents title 13', 'test contents 13', 'test contents raw 13', 'osh', '20230401000000', now(), now()),
+  ('001', 'test contents title 14', 'test contents 14', 'test contents raw 14', 'osh', '20230401000000', now(), now());

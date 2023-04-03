@@ -1,4 +1,4 @@
-package com.dailydatahub.dailydatacrawler.news.dao;
+package com.dailydatahub.dailydatacrawler.domain.dao;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;
@@ -17,14 +17,14 @@ import lombok.ToString;
 @Getter
 @Entity
 @ToString
-public class NewsRaw extends BaseTimeEntity {
+public class DomainRaw extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(columnDefinition = "text", nullable = false)
-	private String domain;
+	private String domainCode;
 
 	@Column(columnDefinition = "text", nullable = false)
 	private String title;
@@ -36,19 +36,19 @@ public class NewsRaw extends BaseTimeEntity {
 	private String contentsRaw;
 
 	@Column(columnDefinition = "text", nullable = false)
-	private String newsWriter;
+	private String contentsWriter;
 
 	@Column(columnDefinition = "text", nullable = false)
-	private LocalDateTime newsDt;
+	private LocalDateTime contentsDt;
 
 	@Builder
-	public NewsRaw(Long id, String domain, String title, String contents, String contentsRaw, String newsWriter, LocalDateTime newsDt) {
+	public DomainRaw(Long id, String domainCode, String title, String contents, String contentsRaw, String contentsWriter, LocalDateTime contentsDt) {
 		this.id = id;
-		this.domain = domain;
+		this.domainCode = domainCode;
 		this.title = title;
 		this.contents = contents;
 		this.contentsRaw = contentsRaw;
-		this.newsWriter = newsWriter;
-		this.newsDt = newsDt;
+		this.contentsWriter = contentsWriter;
+		this.contentsDt = contentsDt;
 	}
 }
