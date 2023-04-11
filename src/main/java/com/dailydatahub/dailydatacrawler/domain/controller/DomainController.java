@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dailydatahub.dailydatacrawler.domain.dao.DomainRaw;
-import com.dailydatahub.dailydatacrawler.domain.dto.DomainRawDto;
 import com.dailydatahub.dailydatacrawler.domain.service.DomainService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,32 +59,32 @@ public class DomainController {
     }
 
     /**
-     * insert 'dto'
+     * insert 'domainRaw'
      * where 'request'
      * 
-     * @param dto
+     * @param domainRaw
      * @param request
      * @return
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public boolean putDomainRaws(@RequestBody DomainRawDto dto, HttpServletRequest request) {
-        return service.putDomainRaws(dto, request);
+    public boolean putDomainRaws(@RequestBody DomainRaw domainRaw, HttpServletRequest request) {
+        return service.putDomainRaws(domainRaw, request);
     }
 
     /**
      * update
      * where 'id'
      * and 'request'
-     * set 'dto'
+     * set 'domainRaw'
      * 
-     * @param dto
+     * @param domainRaw
      * @param request
      * @return
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public boolean postDomainRaws(@RequestBody DomainRawDto dto, HttpServletRequest request,
+    public boolean postDomainRaws(@RequestBody DomainRaw domainRaw, HttpServletRequest request,
             @PathVariable("id") String id) {
-        return service.postDomainRaws(id, dto, request);
+        return service.postDomainRaws(id, domainRaw, request);
     }
 
     /**
