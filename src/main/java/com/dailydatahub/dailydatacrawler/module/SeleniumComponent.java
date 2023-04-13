@@ -33,7 +33,7 @@ public class SeleniumComponent {
         options.addArguments("--disable-gpu");
         options.setCapability("ignoreProtectedModeSettings", true);
         options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--headless=new");
+        //options.addArguments("--headless=new");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
@@ -144,6 +144,21 @@ public class SeleniumComponent {
         System.out.println(targetElement);
         String outerHTML = targetElement.getAttribute("outerHTML");
         return outerHTML;
+    }
+
+    public String requestUrl(String url) {
+        driver.get(url);
+        return driver.getPageSource();
+    }
+
+    public String requestUrlWithWait(String url, long waitPeriod) throws Exception{
+        driver.get(url);
+        Thread.sleep(waitPeriod);
+        return driver.getPageSource();
+    }
+
+    public WebDriver getDriver(){
+        return driver;
     }
 
     public void quitDriver() {

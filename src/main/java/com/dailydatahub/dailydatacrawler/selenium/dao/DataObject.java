@@ -22,7 +22,7 @@ import lombok.ToString;
 @JsonIgnoreProperties
 @JsonPOJOBuilder
 @SuppressWarnings({ "unchecked", "unused" })
-public class DataObject {
+public class DataObject extends JSONObject{
 
     private JSONObject jsonObject;
 

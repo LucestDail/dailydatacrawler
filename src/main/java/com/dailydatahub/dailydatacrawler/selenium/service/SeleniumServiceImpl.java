@@ -17,5 +17,23 @@ public class SeleniumServiceImpl implements SeleniumService{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'putMethod'");
     }
+
+    @Override
+    public JSONObject selectData(JSONObject jsonRequestObject) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'selectData'");
+    }
+
+    @Override
+    public JSONObject deleteData(JSONObject jsonRequestObject) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteData'");
+    }
+
+    @Override
+    public JSONObject insertData(JSONObject jsonRequestObject) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'insertData'");
+    }
     
 }
