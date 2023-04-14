@@ -43,7 +43,9 @@ public class InstagramServiceImpl implements InstagramService{
 
     private String INSTAGRAM = "인스타그램";
     private long DRIVER_TIME_OUT=10000l;
-
+    private String InstagramId = "oshhyosung";
+    private String InstagramPw = "oshh1107";
+    private String instagramLoginUrl = "https://www.instagram.com/accounts/login/";
 
     /**
      * 태그 단위로 검색합니다.
@@ -183,6 +185,14 @@ public class InstagramServiceImpl implements InstagramService{
     private void driverRequestAndWait(String url, Long waitPeriod) throws Exception{
         driverCall().get(url);
         Thread.sleep(waitPeriod);
+        // URL 이 만약 로그인 화면인 경우 로그인 후 동일시간만큼 추가 대기
+        if(driverCall().getCurrentUrl().contains(instagramLoginUrl)){
+            WebElement webElement = driverCall().findElement(By.id("loginForm"));
+            webElement.findElement(By.name("username")).sendKeys(InstagramId);
+            webElement.findElement(By.name("password")).sendKeys(InstagramPw);
+            webElement.submit();
+            Thread.sleep(waitPeriod);
+        }
     }
 
     /**

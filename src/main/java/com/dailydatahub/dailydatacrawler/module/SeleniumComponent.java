@@ -33,7 +33,7 @@ public class SeleniumComponent {
         options.addArguments("--disable-gpu");
         options.setCapability("ignoreProtectedModeSettings", true);
         options.addArguments("--remote-allow-origins=*");
-        //options.addArguments("--headless=new");
+        options.addArguments("--headless=new");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
