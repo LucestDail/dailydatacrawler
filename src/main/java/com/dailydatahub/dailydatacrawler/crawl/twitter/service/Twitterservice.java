@@ -6,5 +6,7 @@ import org.json.simple.JSONObject;
 public interface Twitterservice {
 
     public JSONArray search(String keyword) throws Exception;
+
+    public JSONArray explore() throws Exception;
     
 }

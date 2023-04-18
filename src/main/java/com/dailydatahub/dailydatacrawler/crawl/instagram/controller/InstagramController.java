@@ -36,4 +36,18 @@ public class InstagramController {
         return service.tags(tags);
 
     }
+
+    /**
+     * get Instagram get all of current explore tab
+     * 
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/explore", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONArray tags() throws Exception {
+        return service.explore();
+
+    }
 }

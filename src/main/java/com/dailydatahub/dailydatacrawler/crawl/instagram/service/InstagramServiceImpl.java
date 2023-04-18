@@ -1,14 +1,14 @@
 package com.dailydatahub.dailydatacrawler.crawl.instagram.service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,13 @@ public class InstagramServiceImpl implements InstagramService{
     @Value("${external.instagram.tag.uri}")
     private String tagUri;
 
-    private String INSTAGRAM = "인스타그램";
+    @Value("${external.instagram.explore.uri}")
+    private String exploreUri;
+
+    @Value("${crawler.json.save.path}")
+    private String crawlerJsonSavePath;
+
+    private String INSTAGRAM = "INSTAGRAM";
     private long DRIVER_TIME_OUT=10000l;
     private String InstagramId = "oshhyosung";
     private String InstagramPw = "oshh1107";
@@ -56,6 +62,14 @@ public class InstagramServiceImpl implements InstagramService{
     }
 
     /**
+     * get all of data from instagram explore tab
+     */
+    @Override
+    public JSONArray explore() throws Exception {
+        return requestInterface("explore", null);
+    }
+
+    /**
      * 검색 타입에 키워드를 같이 검색하여 검색 결과를 반환합니다.
      * @param requestType
      * @param keyword
@@ -64,8 +78,11 @@ public class InstagramServiceImpl implements InstagramService{
      */
     private JSONArray requestInterface(String requestType, String keyword) throws Exception{
         JSONArray array = new JSONArray();
+        accessLoginPage();
         switch(requestType){
             case "tags":array = requestTagSearch(keyword);
+                break;
+            case "explore":array = requestExplore();
                 break;
             default:
                 break;
@@ -80,9 +97,50 @@ public class InstagramServiceImpl implements InstagramService{
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
+    private JSONArray requestExplore() throws Exception{
+        log("<PROCESS> access to content list page >>> " + tagUrl + exploreUri);
+        List<String> requestUrlList = new ArrayList<>();
+        try{
+            driverRequestAndWait(tagUrl+exploreUri);
+            scrollDownRequestAndWait();
+        }catch(Exception e){
+            log("<EXCEPTION> can not request and wait process");
+            return null;
+        }
+        for(WebElement we : driverFindElement("main").findElements(By.tagName("a"))){
+            requestUrlList.add(we.getAttribute("href"));
+        }
+        log(requestUrlList);
+        JSONArray array = new JSONArray();
+        for(int i = 0; i < requestUrlList.size(); i++) {
+            try{
+                array.add(requestTagSearchDetail(requestUrlList.get(i), "request"));
+            }catch(Exception e){
+                log("exception : " + requestUrlList.get(i));
+                continue;
+            }
+        }
+        fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + "explore");
+        return array;
+    }
+
+    
+    /**
+     * (tag) 키워드 정보로 검색하여 반환합니다.
+     * @param jsonObject
+     * @return JSONObject
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
     private JSONArray requestTagSearch(String keyword) throws Exception{
         List<String> requestUrlList = new ArrayList<>();
-        driverRequestAndWait(tagUrl+tagUri+keyword,DRIVER_TIME_OUT);
+        try{
+            driverRequestAndWait(tagUrl+tagUri+keyword);
+            scrollDownRequestAndWait();
+        }catch(Exception e){
+            log("<EXCEPTION> can not request and wait process");
+            return null;
+        }
         for(WebElement we : driverFindElement("article").findElements(By.tagName("a"))){
             requestUrlList.add(we.getAttribute("href"));
         }
@@ -96,7 +154,7 @@ public class InstagramServiceImpl implements InstagramService{
                 continue;
             }
         }
-        fileComponent.exportJson(array, "D:/Workspace/Private/Dev", INSTAGRAM + "_" + keyword);
+        fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + keyword);
         return array;
     }
 
@@ -110,7 +168,7 @@ public class InstagramServiceImpl implements InstagramService{
     private JSONObject requestTagSearchDetail(String url, String keyword) throws Exception{
 
         // 드라이버를 호출해 필요한 내용을 찾습니다.
-        driverRequestAndWait(url,DRIVER_TIME_OUT);
+        driverRequestAndWait(url);
         WebElement mainContent = driverFindElement("article");
 
         String regDate  =   null;
@@ -182,16 +240,73 @@ public class InstagramServiceImpl implements InstagramService{
      * @param waitPeriod
      * @throws Exception
      */
-    private void driverRequestAndWait(String url, Long waitPeriod) throws Exception{
-        driverCall().get(url);
-        Thread.sleep(waitPeriod);
-        // URL 이 만약 로그인 화면인 경우 로그인 후 동일시간만큼 추가 대기
-        if(driverCall().getCurrentUrl().contains(instagramLoginUrl)){
-            WebElement webElement = driverCall().findElement(By.id("loginForm"));
-            webElement.findElement(By.name("username")).sendKeys(InstagramId);
-            webElement.findElement(By.name("password")).sendKeys(InstagramPw);
-            webElement.submit();
-            Thread.sleep(waitPeriod);
+    private void driverRequestAndWait(String url) throws Exception{
+        boolean success = false;
+        int retries = 0;
+        int maxTryCount = 10;
+        while (!success && retries < maxTryCount) {
+            try {
+                log("<PROCESS> access to content page");
+                driverCall().get(url);
+                if(retries > 1){
+                    driverCall().navigate().refresh();
+                }
+                Thread.sleep(DRIVER_TIME_OUT);
+                log("<PROCESS> access to content page loaded");
+                success = true;
+            } catch (Exception e) {
+                log("<EXCEPTION> content page loaded failed and request count : " + retries++);
+                continue;
+            }
+        }
+    }
+
+    private void scrollDownRequestAndWait() throws Exception{
+        log("<PROCESS> content page list scroll down");
+        long currentDate = new Date().getTime();
+        while (new Date().getTime() < currentDate + DRIVER_TIME_OUT) { //scroll down 10 sec
+            Thread.sleep(1000); //thread hold and wait
+            //executeScript: JavaScript source execute
+            ((JavascriptExecutor)driverCall()).executeScript("window.scrollTo(0, document.body.scrollHeight)", driverCall().findElement(By.tagName("main")));
+            log("<PROCESS> content page scroll down");
+        }
+    }
+
+    /**
+     * access home page and do login process
+     * @param url
+     * @param waitPeriod
+     * @throws Exception
+     */
+    private void accessLoginPage() throws Exception{
+        try {
+            log("<PROCESS> try login page");
+            driverCall().get(instagramLoginUrl);
+            Thread.sleep(DRIVER_TIME_OUT);
+            log("<PROCESS> try login page loaded");
+            if(driverCall().findElements(By.id("loginForm")).size() != 0){
+                log("<PROCESS> try login page detected");
+                WebElement webElement = driverCall().findElement(By.id("loginForm"));
+                webElement.findElement(By.name("username")).sendKeys(InstagramId);
+                webElement.findElement(By.name("password")).sendKeys(InstagramPw);
+                webElement.submit();
+                Thread.sleep(DRIVER_TIME_OUT);
+            }
+        } catch (Exception e) {
+            System.out.println("exception : Timed out receiving message from renderer >> " + instagramLoginUrl);
+            driverCall().navigate().refresh();
+            log("<PROCESS> try login page");
+            driverCall().get(instagramLoginUrl);
+            Thread.sleep(DRIVER_TIME_OUT);
+            log("<PROCESS> try login page loaded");
+            if(driverCall().findElements(By.id("loginForm")).size() != 0){
+                log("<PROCESS> try login page detected");
+                WebElement webElement = driverCall().findElement(By.id("loginForm"));
+                webElement.findElement(By.name("username")).sendKeys(InstagramId);
+                webElement.findElement(By.name("password")).sendKeys(InstagramPw);
+                webElement.submit();
+                Thread.sleep(DRIVER_TIME_OUT);
+            }
         }
     }
 
@@ -212,7 +327,7 @@ public class InstagramServiceImpl implements InstagramService{
      * @throws Exception
      */
     private WebElement driverFindElement(String elementString) throws Exception{
-        return driverCall().findElement(By.tagName("article"));
+        return driverCall().findElement(By.tagName(elementString));
     }
 
     private void log(Object obj) throws Exception{

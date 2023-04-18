@@ -53,7 +53,10 @@ public class YoutubeServiceImpl implements YoutubeService{
     @Value("${external.youtube.detail.uri}")
     private String detailUri;
 
-    private String YOUTUBE = "유튜브";
+    @Value("${crawler.json.save.path}")
+    private String crawlerJsonSavePath;
+
+    private String YOUTUBE = "YOUTUBE";
 
 
     /**
@@ -62,6 +65,22 @@ public class YoutubeServiceImpl implements YoutubeService{
     @Override
     public JSONArray search(String keyword) throws Exception {
         return requestInterface("search", keyword);
+    }
+
+    /**
+     * 실시간 데이터를 검색합니다.
+     */
+    @Override
+    public JSONArray explore() throws Exception {
+        return requestInterface("explore", null);
+    }
+
+    /**
+     * 실시간 데이터 현재 대상 카운트를 검색합니다.
+     */
+    @Override
+    public JSONArray exploreCount() throws Exception {
+        return requestInterface("exploreCount", null);
     }
 
     /**
@@ -76,6 +95,10 @@ public class YoutubeServiceImpl implements YoutubeService{
         switch(requestType){
             case "search":array = requestKeywordSearch(keyword);
                 break;
+            case "explore":array = requestKeywordSearch(keyword);
+                break;
+            case "exploreCount":array = requestKeywordSearchCount();
+                break;
             default:
                 break;
         }
@@ -89,9 +112,35 @@ public class YoutubeServiceImpl implements YoutubeService{
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
+    private JSONArray requestKeywordSearchCount() throws Exception{
+        // build url
+        String requestUrl = youtubeUrl + searchUri + "?maxResults=50&type=video&key=" + aes.decryptApiKey(API_KEY);
+        URI uri = UriComponentsBuilder
+                .fromUriString(requestUrl)
+                .encode()
+                .build()
+                .toUri();
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(RestComponent.getRequest(uri));
+        JSONArray jsonArray = (JSONArray)parser.parse(json.get("items").toString());
+        log(json);
+        return jsonArray;
+    }
+
+    /**
+     * (tag) 키워드 정보로 검색하여 반환합니다.
+     * @param jsonObject
+     * @return JSONObject
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
     private JSONArray requestKeywordSearch(String keyword) throws Exception{
         // build url
-        String requestUrl = youtubeUrl + searchUri + "?maxResults=50&type=video&videoId=" + keyword + "&key=" + aes.decryptApiKey(API_KEY);
+        String requestUrl = youtubeUrl + searchUri + "?maxResults=50&type=video&q=" + keyword + "&key=" + aes.decryptApiKey(API_KEY);
+        if(keyword == null){
+            requestUrl = youtubeUrl + searchUri + "?maxResults=50&type=video&key=" + aes.decryptApiKey(API_KEY);
+            keyword="explore";
+        }
         URI uri = UriComponentsBuilder
                 .fromUriString(requestUrl)
                 .encode()
@@ -105,8 +154,8 @@ public class YoutubeServiceImpl implements YoutubeService{
             JSONObject jsonObject = (JSONObject) jsonArray.get(i);
             jsonCommentArray = requestKeywordSearchDetail(jsonCommentArray, ((JSONObject)jsonObject.get("id")).get("videoId").toString(),keyword);
         }
-        fileComponent.exportJson(jsonArray, "D:/Workspace/Private/Dev", YOUTUBE + "_" + keyword);
-        fileComponent.exportJson(jsonCommentArray, "D:/Workspace/Private/Dev", YOUTUBE + "_" + keyword + "_COMMENT");
+        fileComponent.exportJson(jsonArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword);
+        fileComponent.exportJson(jsonCommentArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword + "_COMMENT");
         return jsonArray;
     }
 

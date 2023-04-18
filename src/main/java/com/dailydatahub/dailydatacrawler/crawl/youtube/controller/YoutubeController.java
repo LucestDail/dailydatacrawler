@@ -36,4 +36,32 @@ public class YoutubeController {
         return service.search(keyword);
 
     }
+
+    /**
+     * get youtube Search and list of comment
+     * 
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/explore", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONArray explore() throws Exception {
+        return service.explore();
+
+    }
+
+    /**
+     * get youtube Search and list of comment
+     * 
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/explore/count", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONArray exploreCount() throws Exception {
+        return service.exploreCount();
+
+    }
 }

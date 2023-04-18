@@ -34,6 +34,19 @@ public class TwitterController {
     @ResponseBody
     public JSONArray search(@PathVariable("keyword") String keyword) throws Exception {
         return service.search(keyword);
+    }
+
+    /**
+     * get Twitter trend data
+     * 
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/explore", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONArray explore() throws Exception {
+        return service.explore();
 
     }
 }
