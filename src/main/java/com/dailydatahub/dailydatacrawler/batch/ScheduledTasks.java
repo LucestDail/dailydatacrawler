@@ -29,14 +29,14 @@ public class ScheduledTasks {
     @Autowired
     private Twitterservice twitterService;
 
-    @Scheduled(cron="* * * * * *")
+    @Scheduled(cron="0 * * * * *")
 	public void reportCurrentTime(){
 		log.info("<REPORTING> {}", dateFormat.format(new Date()));
 	}
 
-	@Scheduled(cron="0 10 * * * *")
+	@Scheduled(cron="0 0 * * * *")
 	public void youtubeExplore(){
-		log.info("youtubeExplore Execute {}", dateFormat.format(new Date()));
+		log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
         try{
             youtubeService.explore();
         }catch(Exception e){
@@ -44,9 +44,9 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 30 * * * *")
+    @Scheduled(cron="0 10,15,20,25,40,45,50,55 * * * *")
 	public void twitterExplore(){
-		log.info("twitterExplore Execute {}", dateFormat.format(new Date()));
+		log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
         try{
             twitterService.explore();
         }catch(Exception e){
@@ -54,9 +54,9 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 50 * * * *")
+    @Scheduled(cron="0 30 * * * *")
 	public void instagramExplore(){
-		log.info("instagramExplore Execute {}", dateFormat.format(new Date()));
+		log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
         try{
             instagramService.explore();
         }catch(Exception e){
