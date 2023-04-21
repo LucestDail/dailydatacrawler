@@ -123,7 +123,7 @@ public class YoutubeServiceImpl implements YoutubeService{
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(RestComponent.getRequest(uri));
         JSONArray jsonArray = (JSONArray)parser.parse(json.get("items").toString());
-        log(json);
+        log("<PROCESS> JSONObject Allocated : " + requestUrl);
         return jsonArray;
     }
 
@@ -184,7 +184,7 @@ public class YoutubeServiceImpl implements YoutubeService{
         json = ((JSONObject)((JSONArray) parser.parse(json.get("items").toString())).get(0));
         json = (JSONObject) json.get("snippet");
         title = json.get("title").toString();
-        log("<PROCESS>requestKeywordSearchDetailVideo : " + json);
+        log("<PROCESS> JSONObject Allocated : " + requestVideoDetailUrl);
         String requestUrl = youtubeUrl + commentUri + "?part=snippet&maxResults=100&videoId=" + videoId + "&key=" + aes.decryptApiKey(API_KEY);
         uri = UriComponentsBuilder
                 .fromUriString(requestUrl)
@@ -197,7 +197,6 @@ public class YoutubeServiceImpl implements YoutubeService{
             for(int i = 0; i < jsonArray.size(); i++){
                 JSONObject commentObject = ((JSONObject)((JSONObject)jsonArray.get(i)).get("snippet"));
                 JSONObject commentTopJsonObject = ((JSONObject) ((JSONObject) commentObject.get("topLevelComment") ).get("snippet") );
-                log("<PROCESS>requestKeywordSearchDetailComment : " + commentTopJsonObject);
                 hashMap.clear();
                 hashMap.put("_id",      md5.md5AndHex("https://www.youtube.com/watch?v=" + videoId));
                 hashMap.put("snsId",    md5.md5AndHex("https://www.youtube.com/watch?v=" + videoId + commentTopJsonObject.get("updatedAt").toString()));
@@ -209,6 +208,7 @@ public class YoutubeServiceImpl implements YoutubeService{
                 hashMap.put("content",  commentTopJsonObject.get("textOriginal").toString());
                 hashMap.put("title",    title);
                 hashMap.put("status",   true);
+                log("<PROCESS> JSONObject Allocated : " + "https://www.youtube.com/watch?v=" + videoId);
                 jsonCommentArray.add(hashMapToJsonObject(hashMap));
             }
         }catch(Exception e){

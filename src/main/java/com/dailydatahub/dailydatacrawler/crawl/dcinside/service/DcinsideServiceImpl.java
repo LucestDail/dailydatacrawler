@@ -130,7 +130,7 @@ public class DcinsideServiceImpl implements DcinsideService {
                 jsonArray.add(requestTagSearchDetail(requestUrlList.get(i), keyword));
             }catch(Exception e){
                 e.printStackTrace();
-                log("exception : " + requestUrlList.get(i));
+                log("<EXCEPTION> " + requestUrlList.get(i));
                 continue;
             }
         }
@@ -202,7 +202,7 @@ public class DcinsideServiceImpl implements DcinsideService {
         hashMap.put("content",  content);
         hashMap.put("title",    title);
         hashMap.put("status",   true);
-        log(hashMap);
+        log("<PROCESS> JSONObject Allocated : " + url);
         return hashMapToJsonObject(hashMap);
     }
 

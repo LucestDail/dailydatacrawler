@@ -221,7 +221,7 @@ public class InstagramServiceImpl implements InstagramService{
         hashMap.put("content",  content);
         hashMap.put("title",    title);
         hashMap.put("status",   true);
-        log(hashMap);
+        log("<PROCESS> JSONObject Allocated : " + url);
         return hashMapToJsonObject(hashMap);
     }
 

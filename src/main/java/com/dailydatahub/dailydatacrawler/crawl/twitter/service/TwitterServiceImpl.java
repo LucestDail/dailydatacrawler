@@ -107,7 +107,6 @@ public class TwitterServiceImpl implements Twitterservice{
                 requestUrlList.add(we.getAttribute("href"));
             }
         }
-        log(requestUrlList);
         JSONArray array = new JSONArray();
         for(int i = 0; i < requestUrlList.size(); i++) {
             try{
@@ -145,7 +144,6 @@ public class TwitterServiceImpl implements Twitterservice{
                 requestUrlList.add(we.getAttribute("href"));
             }
         }
-        log(requestUrlList);
         JSONArray array = new JSONArray();
         for(int i = 0; i < requestUrlList.size(); i++) {
             try{
@@ -217,7 +215,7 @@ public class TwitterServiceImpl implements Twitterservice{
         hashMap.put("content",  content);
         hashMap.put("title",    title);
         hashMap.put("status",   true);
-        log(hashMap);
+        log("<PROCESS> JSONObject Allocated : " + url);
         return hashMapToJsonObject(hashMap);
     }
 
