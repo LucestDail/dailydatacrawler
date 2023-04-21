@@ -38,7 +38,7 @@ public class ScheduledTasks {
 		log.info("<REPORTING> {}", dateFormat.format(new Date()));
 	}
 
-    @Scheduled(cron="0 0 * * * *")
+    @Scheduled(cron="0 0 1-23/2 * * *")
 	public void dcinsideExplore(){
 		log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
         try{
@@ -48,7 +48,7 @@ public class ScheduledTasks {
         }
 	}
 
-	@Scheduled(cron="0 20 * * * *")
+	@Scheduled(cron="0 20 1-23/2 * * *")
 	public void youtubeExplore(){
 		log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
         try{
@@ -58,7 +58,7 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 10,15,30,35,50,55 * * * *")
+    @Scheduled(cron="0 */5 */2 * * *")
 	public void twitterExplore(){
 		log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
         try{
@@ -68,7 +68,7 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 40 * * * *")
+    @Scheduled(cron="0 40 1-23/2 * * *")
 	public void instagramExplore(){
 		log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
         try{
