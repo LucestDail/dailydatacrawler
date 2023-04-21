@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.dailydatahub.dailydatacrawler.crawl.dcinside.service.DcinsideService;
 import com.dailydatahub.dailydatacrawler.crawl.instagram.service.InstagramService;
 import com.dailydatahub.dailydatacrawler.crawl.twitter.service.Twitterservice;
 import com.dailydatahub.dailydatacrawler.crawl.youtube.service.YoutubeService;
@@ -29,12 +30,25 @@ public class ScheduledTasks {
     @Autowired
     private Twitterservice twitterService;
 
+    @Autowired
+    private DcinsideService dcinsideService;
+
     @Scheduled(cron="0 * * * * *")
 	public void reportCurrentTime(){
 		log.info("<REPORTING> {}", dateFormat.format(new Date()));
 	}
 
-	@Scheduled(cron="0 0 * * * *")
+    @Scheduled(cron="0 0 * * * *")
+	public void dcinsideExplore(){
+		log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
+        try{
+            dcinsideService.explore();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+	}
+
+	@Scheduled(cron="0 20 * * * *")
 	public void youtubeExplore(){
 		log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
         try{
@@ -44,7 +58,7 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 10,15,20,25,40,45,50,55 * * * *")
+    @Scheduled(cron="0 10,15,30,35,50,55 * * * *")
 	public void twitterExplore(){
 		log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
         try{
@@ -54,7 +68,7 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 30 * * * *")
+    @Scheduled(cron="0 40 * * * *")
 	public void instagramExplore(){
 		log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
         try{

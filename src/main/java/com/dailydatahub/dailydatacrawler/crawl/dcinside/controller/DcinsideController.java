@@ -1,5 +1,6 @@
 package com.dailydatahub.dailydatacrawler.crawl.dcinside.controller;
 
+import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,16 +22,27 @@ public class DcinsideController {
     private final DcinsideService dcinsideService;
 
     /**
-     * get Kb ExchangeRate
+     * get dcinside search keyword data bia 10 page
      * 
      * @param param
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/{page}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{keyword}", method = RequestMethod.GET)
     @ResponseBody
-    public String getExchangeRate(@PathVariable("page") String page) throws Exception {
-        return dcinsideService.getPage(page);
+    public JSONArray search(@PathVariable("keyword") String keyword) throws Exception {
+        return dcinsideService.search(keyword);
+    }
 
+     /**
+     * get dcinside explore best contents bia 1 page
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/explore", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONArray explore() throws Exception {
+        return dcinsideService.explore();
     }
 }
