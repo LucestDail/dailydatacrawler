@@ -110,7 +110,6 @@ public class InstagramServiceImpl implements InstagramService{
         for(WebElement we : driverFindElement("main").findElements(By.tagName("a"))){
             requestUrlList.add(we.getAttribute("href"));
         }
-        log(requestUrlList);
         JSONArray array = new JSONArray();
         for(int i = 0; i < requestUrlList.size(); i++) {
             try{
@@ -144,7 +143,6 @@ public class InstagramServiceImpl implements InstagramService{
         for(WebElement we : driverFindElement("article").findElements(By.tagName("a"))){
             requestUrlList.add(we.getAttribute("href"));
         }
-        log(requestUrlList);
         JSONArray array = new JSONArray();
         for(int i = 0; i < requestUrlList.size(); i++) {
             try{
