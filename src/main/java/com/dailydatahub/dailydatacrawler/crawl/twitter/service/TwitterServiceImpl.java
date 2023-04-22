@@ -3,7 +3,9 @@ package com.dailydatahub.dailydatacrawler.crawl.twitter.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,10 +51,12 @@ public class TwitterServiceImpl implements Twitterservice{
     @Value("${crawler.json.save.path}")
     private String crawlerJsonSavePath;
 
+    @Value("${crawler.access.count.max}")
+    private int maxTryCount;
+
     private String TWITTER = "TWITTER";
     private long DRIVER_TIME_OUT=5000l;
-
-    private static List<WebElement> listWebElement;
+    private int CONTENTS_SCRAP_MAX = 100;
 
     /**
      * 태그 단위로 검색합니다.
@@ -98,24 +102,28 @@ public class TwitterServiceImpl implements Twitterservice{
      */
     @SuppressWarnings("unchecked")
     private JSONArray requestWordSearch(String keyword) throws Exception{
-        List<String> requestUrlList = new ArrayList<>();
-        driverRequestAndWait(searchUrl+searchUri+"?q="+keyword,DRIVER_TIME_OUT);
-        scrollDownRequestAndWait();
-        Pattern regex = Pattern.compile("https://twitter.com/[^/]+/status/[^/]+");
-        for(WebElement we : driverCall().findElement(By.tagName("main")).findElement(By.tagName("section")).findElements(By.tagName("a"))){
-            if (regex.matcher(we.getAttribute("href")).matches()){
-                requestUrlList.add(we.getAttribute("href"));
-            }
+
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+
+        try{
+            driverRequestAndWait(searchUrl+searchUri+"?q="+keyword,DRIVER_TIME_OUT);
+            requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
+        }catch(Exception e){
+            log("<EXCEPTION> can not request and wait process");
+            return null;
         }
+
         JSONArray array = new JSONArray();
-        for(int i = 0; i < requestUrlList.size(); i++) {
+
+        for(String requestUrl : requestUrlSet){
             try{
-                array.add(requestWordSearchDetail(requestUrlList.get(i), keyword));
+                array.add(requestWordSearchDetail(requestUrl, keyword));
             }catch(Exception e){
-                log("exception : " + requestUrlList.get(i));
+                log("exception : " + requestUrl);
                 continue;
             }
         }
+
         fileComponent.exportJson(array, crawlerJsonSavePath, TWITTER + "_" + keyword);
         return array;
     }
@@ -129,30 +137,29 @@ public class TwitterServiceImpl implements Twitterservice{
      */
     @SuppressWarnings("unchecked")
     private JSONArray requestExplore() throws Exception{
-        List<String> requestUrlList = new ArrayList<>();
+
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+
         log("<PROCESS> access to content list page >>> " + searchUrl + exploreUri);
         try{
             driverRequestAndWait(searchUrl);
-            scrollDownRequestAndWait();
+            requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
         }catch(Exception e){
             log("<EXCEPTION> can not request and wait process");
             return null;
         }
-        Pattern regex = Pattern.compile("https://twitter.com/[^/]+/status/[^/]+");
-        for(WebElement we : driverCall().findElement(By.tagName("main")).findElement(By.tagName("section")).findElements(By.tagName("a"))){
-            if (regex.matcher(we.getAttribute("href")).matches()){
-                requestUrlList.add(we.getAttribute("href"));
-            }
-        }
+
         JSONArray array = new JSONArray();
-        for(int i = 0; i < requestUrlList.size(); i++) {
+
+        for(String requestUrl : requestUrlSet){
             try{
-                array.add(requestWordSearchDetail(requestUrlList.get(i), "explore"));
+                array.add(requestWordSearchDetail(requestUrl, "explore"));
             }catch(Exception e){
-                log("exception : " + requestUrlList.get(i));
+                log("exception : " + requestUrl);
                 continue;
             }
         }
+
         fileComponent.exportJson(array, crawlerJsonSavePath, TWITTER + "_" + "explore");
         return array;
     }
@@ -266,16 +273,45 @@ public class TwitterServiceImpl implements Twitterservice{
         }
     }
 
-    private void scrollDownRequestAndWait() throws Exception{
-        log("<PROCESS> content page list scroll down");
-        long currentDate = new Date().getTime();
-        while (new Date().getTime() < currentDate + DRIVER_TIME_OUT) { //scroll down 10 sec
-            Thread.sleep(1000); //thread hold and wait
-            //executeScript: JavaScript source execute
-            ((JavascriptExecutor)driverCall()).executeScript("window.scrollTo(0, document.body.scrollHeight)", driverCall().findElements(By.tagName("section")).get(0));
-            log("<PROCESS> content page scroll down");
+
+    private Set scrollDownRequestAndWaitAndGetUrl(Set<String> requestUrlSet) throws Exception{
+        log("<PROCESS> content page scroll down execute");
+        boolean success     = false;
+        int retries         = 0;
+        long currentDate    = 0;
+        while (!success && retries < maxTryCount) {
+            try {
+                while(requestUrlSet.size() < CONTENTS_SCRAP_MAX){
+                    try{
+                        log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size());
+                        currentDate = new Date().getTime();
+                        while (new Date().getTime() < currentDate + DRIVER_TIME_OUT) { 
+                            Thread.sleep(1000);
+                            ((JavascriptExecutor)driverCall()).executeScript("window.scrollTo(0, document.body.scrollHeight)", driverCall().findElement(By.tagName("main")));
+                            log("<PROCESS> content page scroll down");
+                        }
+                        
+                        Pattern regex = Pattern.compile("https://twitter.com/[^/]+/status/[^/]+");
+                        for(WebElement we : driverCall().findElement(By.tagName("main")).findElement(By.tagName("section")).findElements(By.tagName("a"))){
+                            if (regex.matcher(we.getAttribute("href")).matches()){
+                                requestUrlSet.add(we.getAttribute("href"));
+                            }
+                        }
+                        driverCall().navigate().refresh();
+                    }catch(Exception e){
+                        driverCall().navigate().refresh();
+                        continue;
+                    }
+                }
+                success = true;
+            } catch (Exception e) {
+                log("<EXCEPTION> content page loaded failed and request count : " + retries++);
+                continue;
+            }
         }
+        return requestUrlSet;
     }
+
 
     /**
      * map 자료구조를 JSONObject 자료구조로 변환하여 반환합니다.
