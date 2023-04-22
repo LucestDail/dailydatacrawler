@@ -1,12 +1,9 @@
 package com.dailydatahub.dailydatacrawler.crawl.twitter.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.simple.JSONArray;
