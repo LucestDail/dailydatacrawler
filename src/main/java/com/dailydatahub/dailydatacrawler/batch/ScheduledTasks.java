@@ -33,16 +33,23 @@ public class ScheduledTasks {
     @Autowired
     private DcinsideService dcinsideService;
 
+    private boolean logFlag = false;
+
     @Scheduled(cron="0 * * * * *")
 	public void reportCurrentTime(){
-		log.info("<REPORTING> {}", dateFormat.format(new Date()));
+        if(logFlag){
+            log.info("<REPORTING> {}", dateFormat.format(new Date()));
+        }
+		
 	}
 
     @Scheduled(cron="0 0 1-23/2 * * *")
 	public void dcinsideExplore(){
-		log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
+         if(logFlag){
+		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
+         }
         try{
-            dcinsideService.explore();
+            //dcinsideService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -50,9 +57,11 @@ public class ScheduledTasks {
 
 	@Scheduled(cron="0 20 1-23/2 * * *")
 	public void youtubeExplore(){
-		log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
+         if(logFlag){
+		    log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
+         }
         try{
-            youtubeService.explore();
+            //youtubeService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -60,9 +69,11 @@ public class ScheduledTasks {
 
     @Scheduled(cron="0 */5 */2 * * *")
 	public void twitterExplore(){
-		log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
+         if(logFlag){
+		    log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
+         }
         try{
-            twitterService.explore();
+            //twitterService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -72,7 +83,7 @@ public class ScheduledTasks {
 	public void instagramExplore(){
 		log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
         try{
-            instagramService.explore();
+            //instagramService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }

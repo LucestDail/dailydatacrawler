@@ -107,19 +107,23 @@ public class InstagramServiceImpl implements InstagramService{
             log("<EXCEPTION> can not request and wait process");
             return null;
         }
-        for(WebElement we : driverFindElement("main").findElements(By.tagName("a"))){
+        List<WebElement> targetTagWebElementList = driverFindElement("main").findElements(By.tagName("a"));
+        for(WebElement we : targetTagWebElementList){
             requestUrlList.add(we.getAttribute("href"));
         }
         JSONArray array = new JSONArray();
+        JSONArray arrayComment = new JSONArray();
         for(int i = 0; i < requestUrlList.size(); i++) {
             try{
-                array.add(requestTagSearchDetail(requestUrlList.get(i), "request"));
+                array.add(requestTagSearchDetail(requestUrlList.get(i), "explore"));
+                arrayComment = scrapCommentList(arrayComment, requestUrlList.get(i), "explore");
             }catch(Exception e){
                 log("exception : " + requestUrlList.get(i));
                 continue;
             }
         }
         fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + "explore");
+        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + "explore");
         return array;
     }
 
@@ -140,19 +144,24 @@ public class InstagramServiceImpl implements InstagramService{
             log("<EXCEPTION> can not request and wait process");
             return null;
         }
-        for(WebElement we : driverFindElement("article").findElements(By.tagName("a"))){
+
+        List<WebElement> targetTagWebElementList = driverFindElement("article").findElements(By.tagName("a"));
+        for(WebElement we : targetTagWebElementList){
             requestUrlList.add(we.getAttribute("href"));
         }
         JSONArray array = new JSONArray();
+        JSONArray arrayComment = new JSONArray();
         for(int i = 0; i < requestUrlList.size(); i++) {
             try{
                 array.add(requestTagSearchDetail(requestUrlList.get(i), keyword));
+                arrayComment = scrapCommentList(arrayComment, requestUrlList.get(i), keyword);
             }catch(Exception e){
                 log("exception : " + requestUrlList.get(i));
                 continue;
             }
         }
         fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + keyword);
+        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + keyword);
         return array;
     }
 
@@ -221,6 +230,77 @@ public class InstagramServiceImpl implements InstagramService{
         hashMap.put("status",   true);
         log("<PROCESS> JSONObject Allocated : " + url);
         return hashMapToJsonObject(hashMap);
+    }
+
+
+    /**
+     * 현재 드라이버 페이지의 댓글(인스타) 리스트를 가져온다.
+     * @param jsonArray
+     * @return
+     * @throws Exception
+     */
+    private JSONArray scrapCommentList(JSONArray jsonArray, String url, String keyword) throws Exception{
+
+        // 현재 페이지에서 댓글 영역에 해당하는 웹 엘리먼트를 스크랩한다.
+        WebElement mainContent = driverFindElement("article");
+        List<WebElement> commentWebElementList = mainContent.findElements(By.tagName("ul"));
+        // JSONObject 데이터 할당을 위한 변수 선언
+        String regDate  =   null;
+        String content  =   null;
+        String title    =   null;
+        String author   =   null;
+
+        for(WebElement we : commentWebElementList){
+            
+
+            // 댓글에 해당하는 클래스 이외에는 로직처리 안함
+            if(!we.getAttribute("class").contains("_a9ym")) continue;
+            
+            // 할당 전 변수 초기화
+            regDate     =   null;
+            content     =   null;
+            title       =   null;
+            author      =   null;
+
+            // 작성 일시
+            try{
+                regDate      = we.findElement(By.tagName("time")).getAttribute("datetime");
+            }catch(Exception e){
+                log("<EXCEPTION> JSONObject Allocated fail from regdate : " + url);
+            }
+
+            try{
+                // 작성 내용(추가 태그 포함)
+                content      = we.getText();
+                // 작성 내용 중 첫번째 줄 기준 최대 30자까지를 제목으로 지정한다.
+                title        = content.substring(0,30);
+            }catch(Exception e){
+                log("<EXCEPTION> JSONObject Allocated fail from content : " + url);
+            }
+
+            // 작성자 ID
+            try{
+                author      = we.findElement(By.cssSelector("h3._a9zc")).getText();
+            }catch(Exception e){
+                log("<EXCEPTION> JSONObject Allocated fail from author : " + url);
+            }
+
+            String category     = keyword;
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("_id",      md5.md5AndHex(url));
+            hashMap.put("snsId",    md5.md5AndHex(url+regDate));
+            hashMap.put("url",      url);
+            hashMap.put("category", category);
+            hashMap.put("press",    INSTAGRAM);
+            hashMap.put("regDate",  regDate);
+            hashMap.put("author",   author);
+            hashMap.put("content",  content);
+            hashMap.put("title",    title);
+            hashMap.put("status",   true);
+            log("<PROCESS> JSONObject[comment] Allocated : " + url);
+            jsonArray.add(hashMapToJsonObject(hashMap));
+        }
+        return jsonArray;
     }
 
     /**
