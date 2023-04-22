@@ -34,7 +34,7 @@ public class SeleniumComponent {
         options.addArguments("--disable-gpu");
         options.setCapability("ignoreProtectedModeSettings", true);
         options.addArguments("--remote-allow-origins=*");
-        // options.addArguments("--headless=new");
+        options.addArguments("--headless=new");
         options.addArguments("start-maximized"); // https://stackoverflow.com/a/26283818/1689770
         options.addArguments("enable-automation"); // https://stackoverflow.com/a/43840128/1689770
         options.addArguments("--disable-dev-shm-usage"); //https://stackoverflow.com/a/50725918/1689770
