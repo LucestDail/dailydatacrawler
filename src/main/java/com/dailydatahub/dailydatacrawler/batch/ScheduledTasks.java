@@ -36,11 +36,11 @@ public class ScheduledTasks {
 
     
     @Value("${crawler.log.flag}")
-    private boolean logFlag;
+    private String logFlag;
 
     @Scheduled(cron="0 0 * * * *")
 	public void reportCurrentTime(){
-        if(logFlag){
+        if(Boolean.parseBoolean(logFlag)){
             log.info("<REPORTING> {}", dateFormat.format(new Date()));
         }
 		
@@ -48,9 +48,9 @@ public class ScheduledTasks {
 
     @Scheduled(cron="0 0 0,4,8,12,16,20 * * *")
 	public void dcinsideExplore(){
-         if(logFlag){
+        if(Boolean.parseBoolean(logFlag)){
 		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
-         }
+        }
         try{
             dcinsideService.explore();
         }catch(Exception e){
@@ -60,7 +60,7 @@ public class ScheduledTasks {
 
 	@Scheduled(cron="0 0 1,5,9,13,17,21 * * *")
 	public void youtubeExplore(){
-         if(logFlag){
+        if(Boolean.parseBoolean(logFlag)){
 		    log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
@@ -72,7 +72,7 @@ public class ScheduledTasks {
 
     @Scheduled(cron="0 0 2,6,10,14,18,22 * * *")
 	public void twitterExplore(){
-         if(logFlag){
+        if(Boolean.parseBoolean(logFlag)){
 		    log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
@@ -84,7 +84,9 @@ public class ScheduledTasks {
 
     @Scheduled(cron="0 0 3,7,11,15,19,23 * * *")
 	public void instagramExplore(){
-		log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
+        if(Boolean.parseBoolean(logFlag)){
+            log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
+        }
         try{
             instagramService.explore();
         }catch(Exception e){
