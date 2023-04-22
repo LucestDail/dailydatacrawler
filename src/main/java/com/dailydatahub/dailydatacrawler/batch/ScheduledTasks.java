@@ -38,7 +38,7 @@ public class ScheduledTasks {
     @Value("${crawler.log.flag}")
     private String logFlag;
 
-    @Scheduled(cron="0 0 * * * *")
+    @Scheduled(cron="0 * * * * *")
 	public void reportCurrentTime(){
         if(Boolean.parseBoolean(logFlag)){
             log.info("<REPORTING> {}", dateFormat.format(new Date()));
