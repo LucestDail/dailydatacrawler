@@ -1,9 +1,10 @@
 package com.dailydatahub.dailydatacrawler.crawl.instagram.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -47,12 +48,15 @@ public class InstagramServiceImpl implements InstagramService{
     @Value("${crawler.json.save.path}")
     private String crawlerJsonSavePath;
 
+    @Value("${crawler.access.count.max}")
+    private int maxTryCount;
+
     private String INSTAGRAM = "INSTAGRAM";
     private long DRIVER_TIME_OUT=10000l;
     private String InstagramId = "oshhyosung";
     private String InstagramPw = "oshh1107";
     private String instagramLoginUrl = "https://www.instagram.com/accounts/login/";
-
+    private int CONTENTS_SCRAP_MAX = 100;
     /**
      * 태그 단위로 검색합니다.
      */
@@ -99,29 +103,31 @@ public class InstagramServiceImpl implements InstagramService{
     @SuppressWarnings("unchecked")
     private JSONArray requestExplore() throws Exception{
         log("<PROCESS> access to content list page >>> " + tagUrl + exploreUri);
-        List<String> requestUrlList = new ArrayList<>();
+
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+        
         try{
             driverRequestAndWait(tagUrl+exploreUri);
-            scrollDownRequestAndWait();
+            requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
         }catch(Exception e){
+            e.printStackTrace();
             log("<EXCEPTION> can not request and wait process");
             return null;
         }
-        List<WebElement> targetTagWebElementList = driverFindElement("main").findElements(By.tagName("a"));
-        for(WebElement we : targetTagWebElementList){
-            requestUrlList.add(we.getAttribute("href"));
-        }
+
         JSONArray array = new JSONArray();
         JSONArray arrayComment = new JSONArray();
-        for(int i = 0; i < requestUrlList.size(); i++) {
+
+        for(String requestUrl : requestUrlSet){
             try{
-                array.add(requestTagSearchDetail(requestUrlList.get(i), "explore"));
-                arrayComment = scrapCommentList(arrayComment, requestUrlList.get(i), "explore");
+                array.add(requestTagSearchDetail(requestUrl, "explore"));
+                arrayComment = scrapCommentList(arrayComment, requestUrl, "explore");
             }catch(Exception e){
-                log("exception : " + requestUrlList.get(i));
+                log("exception : " + requestUrl);
                 continue;
             }
         }
+
         fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + "explore");
         fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + "explore");
         return array;
@@ -136,30 +142,28 @@ public class InstagramServiceImpl implements InstagramService{
      */
     @SuppressWarnings("unchecked")
     private JSONArray requestTagSearch(String keyword) throws Exception{
-        List<String> requestUrlList = new ArrayList<>();
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
         try{
             driverRequestAndWait(tagUrl+tagUri+keyword);
-            scrollDownRequestAndWait();
+            requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
         }catch(Exception e){
             log("<EXCEPTION> can not request and wait process");
             return null;
         }
 
-        List<WebElement> targetTagWebElementList = driverFindElement("article").findElements(By.tagName("a"));
-        for(WebElement we : targetTagWebElementList){
-            requestUrlList.add(we.getAttribute("href"));
-        }
         JSONArray array = new JSONArray();
         JSONArray arrayComment = new JSONArray();
-        for(int i = 0; i < requestUrlList.size(); i++) {
+        
+        for(String requestUrl : requestUrlSet){
             try{
-                array.add(requestTagSearchDetail(requestUrlList.get(i), keyword));
-                arrayComment = scrapCommentList(arrayComment, requestUrlList.get(i), keyword);
+                array.add(requestTagSearchDetail(requestUrl, keyword));
+                arrayComment = scrapCommentList(arrayComment, requestUrl, keyword);
             }catch(Exception e){
-                log("exception : " + requestUrlList.get(i));
+                log("exception : " + requestUrl);
                 continue;
             }
         }
+        
         fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + keyword);
         fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + keyword);
         return array;
@@ -321,7 +325,6 @@ public class InstagramServiceImpl implements InstagramService{
     private void driverRequestAndWait(String url) throws Exception{
         boolean success = false;
         int retries = 0;
-        int maxTryCount = 10;
         while (!success && retries < maxTryCount) {
             try {
                 log("<PROCESS> access to content page");
@@ -339,15 +342,41 @@ public class InstagramServiceImpl implements InstagramService{
         }
     }
 
-    private void scrollDownRequestAndWait() throws Exception{
-        log("<PROCESS> content page list scroll down");
-        long currentDate = new Date().getTime();
-        while (new Date().getTime() < currentDate + DRIVER_TIME_OUT) { //scroll down 10 sec
-            Thread.sleep(1000); //thread hold and wait
-            //executeScript: JavaScript source execute
-            ((JavascriptExecutor)driverCall()).executeScript("window.scrollTo(0, document.body.scrollHeight)", driverCall().findElement(By.tagName("main")));
-            log("<PROCESS> content page scroll down");
+    private Set scrollDownRequestAndWaitAndGetUrl(Set<String> requestUrlSet) throws Exception{
+        log("<PROCESS> content page scroll down execute");
+        boolean success     = false;
+        int retries         = 0;
+        long currentDate    = 0;
+        while (!success && retries < maxTryCount) {
+            try {
+                while(requestUrlSet.size() < CONTENTS_SCRAP_MAX){
+                    try{
+                        log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size());
+                        currentDate = new Date().getTime();
+                        while (new Date().getTime() < currentDate + DRIVER_TIME_OUT) { 
+                            Thread.sleep(1000);
+                            ((JavascriptExecutor)driverCall()).executeScript("window.scrollTo(0, document.body.scrollHeight)", driverCall().findElement(By.tagName("main")));
+                            log("<PROCESS> content page scroll down");
+                        }
+                        List<WebElement> targetTagWebElementList = driverFindElement("main").findElements(By.tagName("a"));
+                        for(WebElement we : targetTagWebElementList){
+                            requestUrlSet.add(we.getAttribute("href"));
+                        }
+                    }catch(Exception e){
+                        driverCall().navigate().refresh();
+                        continue;
+                    }
+                }
+                success = true;
+            } catch (Exception e) {
+                log("<EXCEPTION> content page loaded failed and request count : " + retries++);
+                continue;
+            }
         }
+
+
+        
+        return requestUrlSet;
     }
 
     /**
