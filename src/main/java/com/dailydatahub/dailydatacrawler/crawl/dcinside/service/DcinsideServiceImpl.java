@@ -1,8 +1,9 @@
 package com.dailydatahub.dailydatacrawler.crawl.dcinside.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -46,7 +47,6 @@ public class DcinsideServiceImpl implements DcinsideService {
 
     @Value("${crawler.json.save.path}")
     private String crawlerJsonSavePath;
-
     private String DCINSIDE = "DCINSIDE";
 
     @Autowired
@@ -63,21 +63,72 @@ public class DcinsideServiceImpl implements DcinsideService {
 
     @Override
     public JSONArray search(String keyword) throws Exception {
-        JSONArray array = new JSONArray();
-        for(int i = 0; i < maxPageCount; i++){
-            driverRequestAndWait(dcinsideUrl + i + dcinsideUrlEtc + keyword);
-            queryPageAndConvertJsonArray(array, keyword);
+
+
+        // 대상 url 정보를 가져옵니다.
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+        try{
+            driverRequestAndWait(dcinsideBestUrl);
+            requestUrlSet = getUrlSetSearch(requestUrlSet);
+        }catch(Exception e){
+            e.printStackTrace();
+            log("<EXCEPTION> can not request and wait process");
+            return null;
         }
-        fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + "keyword");
+
+        JSONArray array = new JSONArray();
+        JSONArray arrayComment = new JSONArray();
+        for(String requestUrl : requestUrlSet){
+            try{
+                 // 대상 url 을 접근합니다.
+                driverRequestAndWait(requestUrl);
+                // 대상 본문 정보와 댓글 정보를 가져옵니다.
+                log("<PROCESS> scrap content");
+                array = scrapContentList(array, requestUrl, keyword);
+                log("<PROCESS> scrap comment list");
+                arrayComment = scrapCommentList(arrayComment, requestUrl, keyword);
+            }catch(Exception e){
+                log("exception : " + requestUrl);
+                continue;
+            }
+        }
+        fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + keyword);
+        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + keyword);
         return array;
     }
 
     @Override
     public JSONArray explore() throws Exception {
+
+        // 대상 url 정보를 가져옵니다.
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+        try{
+            driverRequestAndWait(dcinsideBestUrl);
+            requestUrlSet = getUrlSetExplore(requestUrlSet);
+        }catch(Exception e){
+            e.printStackTrace();
+            log("<EXCEPTION> can not request and wait process");
+            return null;
+        }
+
         JSONArray array = new JSONArray();
-        driverRequestAndWait(dcinsideBestUrl);
-        queryBoardAndConvertJsonArray(array, "explore");
+        JSONArray arrayComment = new JSONArray();
+        for(String requestUrl : requestUrlSet){
+            try{
+                 // 대상 url 을 접근합니다.
+                driverRequestAndWait(requestUrl);
+                // 대상 본문 정보와 댓글 정보를 가져옵니다.
+                log("<PROCESS> scrap content");
+                array = scrapContentList(array, requestUrl, "explore");
+                log("<PROCESS> scrap comment list");
+                arrayComment = scrapCommentList(arrayComment, requestUrl, "explore");
+            }catch(Exception e){
+                log("exception : " + requestUrl);
+                continue;
+            }
+        }
         fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + "explore");
+        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + "explore");
         return array;
     }
 
@@ -116,47 +167,37 @@ public class DcinsideServiceImpl implements DcinsideService {
         }
     }
 
-
-    private JSONArray queryBoardAndConvertJsonArray(JSONArray jsonArray, String keyword) throws Exception{
-        WebElement webElement = driverCall().findElement(By.tagName("body"));
-        WebElement targetElement = webElement.findElement(By.tagName("tbody"));
-        List<WebElement> listWebElement = targetElement.findElements(By.cssSelector("tr.ub-content.us-post"));
-        List<String> requestUrlList = new ArrayList<>();
-        for(WebElement we : listWebElement){
-            requestUrlList.add(we.findElement(By.cssSelector("td.gall_tit.ub-word")).findElements(By.tagName("a")).get(0).getAttribute("href"));
-        }
-        for(int i = 0; i < requestUrlList.size(); i++) {
-            try{
-                jsonArray.add(requestTagSearchDetail(requestUrlList.get(i), keyword));
-            }catch(Exception e){
-                e.printStackTrace();
-                log("<EXCEPTION> " + requestUrlList.get(i));
-                continue;
-            }
-        }
-        return jsonArray;
-    }
-
-    private JSONArray queryPageAndConvertJsonArray(JSONArray jsonArray, String keyword)throws Exception{
+    private Set getUrlSetSearch(Set<String> requestUrlSet) throws Exception{
+        log("<PROCESS> content page scroll down execute");
         WebElement webElement = driverCall().findElement(By.tagName("body"));
         WebElement targetElement = webElement.findElement(By.className(dcinsideTargetElemenString));
         List<WebElement> listWebElement = targetElement.findElements(By.tagName("a"));
-        List<String> requestUrlList = new ArrayList<>();
         for(WebElement we : listWebElement){
             if(we.getAttribute("href").contains("view")){
-                requestUrlList.add(we.getAttribute("href"));
+                requestUrlSet.add(we.getAttribute("href"));
             }
         }
-        for(int i = 0; i < requestUrlList.size(); i++) {
-            try{
-                jsonArray.add(requestTagSearchDetail(requestUrlList.get(i), keyword));
-            }catch(Exception e){
-                e.printStackTrace();
-                log("exception : " + requestUrlList.get(i));
-                continue;
-            }
+        return requestUrlSet;
+    }
+
+    private Set getUrlSetExplore(Set<String> requestUrlSet) throws Exception{
+        log("<PROCESS> content page scroll down execute");
+        WebElement webElement = driverCall().findElement(By.tagName("body"));
+        WebElement targetElement = webElement.findElement(By.tagName("tbody"));
+        List<WebElement> listWebElement = targetElement.findElements(By.cssSelector("tr.ub-content.us-post"));
+        for(WebElement we : listWebElement){
+            requestUrlSet.add(we.findElement(By.cssSelector("td.gall_tit.ub-word")).findElements(By.tagName("a")).get(0).getAttribute("href"));
         }
+        return requestUrlSet;
+    }
+
+    private JSONArray scrapContentList(JSONArray jsonArray, String requestUrl, String keyword) throws Exception{
+        jsonArray.add(requestTagSearchDetail(requestUrl, keyword));
         return jsonArray;
+    }
+
+    private JSONArray scrapCommentList(JSONArray jsonArray, String requestUrl, String keyword) throws Exception{
+        return requestTagSearchDetailComment(jsonArray, requestUrl, keyword);
     }
 
     /**
@@ -165,11 +206,9 @@ public class DcinsideServiceImpl implements DcinsideService {
      * @return JSONObject
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     private JSONObject requestTagSearchDetail(String url, String keyword) throws Exception{
 
-        // 드라이버를 호출해 필요한 내용을 찾습니다.
-        driverRequestAndWait(url);
+        // 드라이버 브라우저에서 필요한 내용을 찾습니다.
         WebElement mainContent = driverFindElementID("container");
         WebElement mainArticle = mainContent.findElement(By.className("view_content_wrap"));
 
@@ -207,6 +246,78 @@ public class DcinsideServiceImpl implements DcinsideService {
     }
 
     /**
+     * (tag)url 정보로 접속하여 상세 정보의 댓글 정보를 가져옵니다.
+     * @param url
+     * @return JSONObject
+     * @throws Exception
+     */
+    private JSONArray requestTagSearchDetailComment(JSONArray jsonArray, String url, String keyword) throws Exception{
+
+        // 드라이버 브라우저에서 필요한 내용을 찾습니다.
+        WebElement mainContent = driverFindElementCSSSelector("ul.cmt_list");
+        List<WebElement> commentWebElementList = mainContent.findElements(By.cssSelector("li.ub-content"));
+
+        // JSONObject 데이터 할당을 위한 변수 선언
+        String regDate          =   null;
+        String content          =   null;
+        String title            =   null;
+        String author           =   null;
+        String authorIp         = null;
+        String authorNickName   = null;
+        String authorId         =  null;
+        log("<PROCESS> requestTagSearchDetailComment looping count : " + commentWebElementList.size());
+        for(WebElement we : commentWebElementList){
+            // 할당 전 변수 초기화
+            regDate     =   null;
+            content     =   null;
+            title       =   null;
+            author      =   null;
+
+            // 작성 일시
+            try{
+                regDate      = we.findElement(By.cssSelector("span.date_time")).getText();
+            }catch(Exception e){
+                log("<EXCEPTION> JSONObject Allocated fail from regdate : " + url);
+            }
+
+            try{
+                // 작성 내용(추가 태그 포함)
+                content      = we.getText();
+                // 작성 내용 중 첫번째 줄 기준 최대 30자까지를 제목으로 지정한다.
+                title        = content.substring(0,30);
+            }catch(Exception e){
+                log("<EXCEPTION> JSONObject Allocated fail from content : " + url);
+            }
+
+            // 작성자 ID
+            try{
+                WebElement authorElement = we.findElement(By.cssSelector("span.gall_writer.ub-writer"));
+                authorIp = authorElement.getAttribute("data-ip");
+                authorNickName = authorElement.getAttribute("data-nick");
+                authorId = authorElement.getAttribute("data-uid");
+            }catch(Exception e){
+                log("<EXCEPTION> autho information has failed");
+            }
+            author = authorNickName + "(" + authorId + "," + authorIp + ")";
+            String category     = keyword;
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("_id",      md5.md5AndHex(url));
+            hashMap.put("snsId",    md5.md5AndHex(url+regDate));
+            hashMap.put("url",      url);
+            hashMap.put("category", category);
+            hashMap.put("press",    DCINSIDE);
+            hashMap.put("regDate",  regDate);
+            hashMap.put("author",   author);
+            hashMap.put("content",  content);
+            hashMap.put("title",    title);
+            hashMap.put("status",   true);
+            log("<PROCESS> JSONObject[comment] Allocated : " + url);
+            jsonArray.add(hashMapToJsonObject(hashMap));
+        }
+        return jsonArray;
+    }
+
+    /**
      * map 자료구조를 JSONObject 자료구조로 변환하여 반환합니다.
      * @param hashMap
      * @return JSONObject
@@ -234,6 +345,16 @@ public class DcinsideServiceImpl implements DcinsideService {
      */
     private WebElement driverFindElementID(String elementString) throws Exception{
         return driverCall().findElement(By.id(elementString));
+    }
+
+     /**
+     * 현재 드라이버에서 HTML 태그 엘리먼트 ID를 검색합니다.
+     * @param elementString
+     * @return WebElement
+     * @throws Exception
+     */
+    private WebElement driverFindElementCSSSelector(String elementString) throws Exception{
+        return driverCall().findElement(By.cssSelector(elementString));
     }
 
     private void log(Object obj) throws Exception{
