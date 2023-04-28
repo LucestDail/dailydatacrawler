@@ -284,9 +284,9 @@ public class DcinsideServiceImpl implements DcinsideService {
                 // 작성 내용(추가 태그 포함)
                 content      = we.getText();
                 // 작성 내용 중 첫번째 줄 기준 최대 30자까지를 제목으로 지정한다.
-                title        = content.substring(0,30);
+                title        = driverFindElementID("container").findElement(By.className("view_content_wrap")).findElement(By.className("title_subject")).getText();
             }catch(Exception e){
-                log("<EXCEPTION> JSONObject Allocated fail from content : " + url);
+                log("<EXCEPTION> JSONObject Allocated fail from content and title : " + url);
             }
 
             // 작성자 ID

@@ -120,6 +120,7 @@ public class InstagramServiceImpl implements InstagramService{
 
         for(String requestUrl : requestUrlSet){
             try{
+                driverRequestAndWait(requestUrl);
                 array.add(requestTagSearchDetail(requestUrl, "explore"));
                 arrayComment = scrapCommentList(arrayComment, requestUrl, "explore");
             }catch(Exception e){
@@ -156,6 +157,7 @@ public class InstagramServiceImpl implements InstagramService{
         
         for(String requestUrl : requestUrlSet){
             try{
+                driverRequestAndWait(requestUrl);
                 array.add(requestTagSearchDetail(requestUrl, keyword));
                 arrayComment = scrapCommentList(arrayComment, requestUrl, keyword);
             }catch(Exception e){
@@ -177,11 +179,9 @@ public class InstagramServiceImpl implements InstagramService{
      */
     @SuppressWarnings("unchecked")
     private JSONObject requestTagSearchDetail(String url, String keyword) throws Exception{
-
-        // 드라이버를 호출해 필요한 내용을 찾습니다.
-        driverRequestAndWait(url);
-        WebElement mainContent = driverFindElement("article");
-
+        WebElement mainArea = driverCall().findElement(By.tagName("main"));
+        WebElement contentArea = driverCall().findElement(By.cssSelector("ul._a9z6._a9za"));
+        WebElement mainContent = contentArea.findElement(By.tagName("div"));
         String regDate  =   null;
         String content  =   null;
         String title    =   null;
@@ -210,7 +210,7 @@ public class InstagramServiceImpl implements InstagramService{
 
         // 작성자 ID
         try{
-            author      = mainContent
+            author      = mainArea
                             .findElement(By.tagName("header"))
                             .findElement(By.tagName("a"))
                             .getAttribute("href")
@@ -233,6 +233,7 @@ public class InstagramServiceImpl implements InstagramService{
         hashMap.put("title",    title);
         hashMap.put("status",   true);
         log("<PROCESS> JSONObject Allocated : " + url);
+        log(hashMap);
         return hashMapToJsonObject(hashMap);
     }
 
@@ -245,9 +246,8 @@ public class InstagramServiceImpl implements InstagramService{
      */
     private JSONArray scrapCommentList(JSONArray jsonArray, String url, String keyword) throws Exception{
 
-        // 현재 페이지에서 댓글 영역에 해당하는 웹 엘리먼트를 스크랩한다.
-        WebElement mainContent = driverFindElement("article");
-        List<WebElement> commentWebElementList = mainContent.findElements(By.tagName("ul"));
+        WebElement contentArea = driverCall().findElement(By.cssSelector("ul._a9z6._a9za"));
+        List<WebElement> commentWebElementList = contentArea.findElements(By.tagName("ul"));
         // JSONObject 데이터 할당을 위한 변수 선언
         String regDate  =   null;
         String content  =   null;
@@ -302,6 +302,7 @@ public class InstagramServiceImpl implements InstagramService{
             hashMap.put("title",    title);
             hashMap.put("status",   true);
             log("<PROCESS> JSONObject[comment] Allocated : " + url);
+            log(hashMap);
             jsonArray.add(hashMapToJsonObject(hashMap));
         }
         return jsonArray;
