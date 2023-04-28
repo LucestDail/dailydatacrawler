@@ -46,19 +46,9 @@ public class ScheduledTasks {
 		
 	}
 
-    @Scheduled(cron="0 0 0,4,8,12,16,20 * * *")
-	public void dcinsideExplore(){
-        if(Boolean.parseBoolean(logFlag)){
-		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
-        }
-        try{
-            dcinsideService.explore();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-	}
+    
 
-	@Scheduled(cron="0 0 1,5,9,13,17,21 * * *")
+	@Scheduled(cron="0 0 * * * *")
 	public void youtubeExplore(){
         if(Boolean.parseBoolean(logFlag)){
 		    log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
@@ -70,7 +60,7 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 0 2,6,10,14,18,22 * * *")
+    @Scheduled(cron="0 0 1,4,7,10,13,16,19,22 * * *")
 	public void twitterExplore(){
         if(Boolean.parseBoolean(logFlag)){
 		    log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
@@ -82,13 +72,25 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 0 3,7,11,15,19,23 * * *")
+    @Scheduled(cron="0 0 2,5,8,11,14,17,20,23 * * *")
 	public void instagramExplore(){
         if(Boolean.parseBoolean(logFlag)){
             log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
         }
         try{
             instagramService.explore();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+	}
+
+    @Scheduled(cron="0 0 0,3,6,9,12,15,18,21 * * *")
+	public void dcinsideExplore(){
+        if(Boolean.parseBoolean(logFlag)){
+		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
+        }
+        try{
+            dcinsideService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }
