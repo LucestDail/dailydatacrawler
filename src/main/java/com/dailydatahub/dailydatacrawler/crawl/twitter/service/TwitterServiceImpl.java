@@ -54,6 +54,7 @@ public class TwitterServiceImpl implements Twitterservice{
     private String TWITTER = "TWITTER";
     private long DRIVER_TIME_OUT=5000l;
     private int CONTENTS_SCRAP_MAX = 100;
+    private int CONTENTS_SCRAP_TRY_MAX = 10;
 
     /**
      * 태그 단위로 검색합니다.
@@ -276,11 +277,13 @@ public class TwitterServiceImpl implements Twitterservice{
         boolean success     = false;
         int retries         = 0;
         long currentDate    = 0;
+        int checkRetries    = 0;
+        int beforeSetCount  = 0;
         while (!success && retries < maxTryCount) {
             try {
-                while(requestUrlSet.size() < CONTENTS_SCRAP_MAX){
+                while(requestUrlSet.size() < CONTENTS_SCRAP_MAX && checkRetries < CONTENTS_SCRAP_TRY_MAX){
                     try{
-                        log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size());
+                        log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size() + " / request retry count : " + checkRetries);
                         currentDate = new Date().getTime();
                         while (new Date().getTime() < currentDate + DRIVER_TIME_OUT) { 
                             Thread.sleep(1000);
@@ -294,6 +297,10 @@ public class TwitterServiceImpl implements Twitterservice{
                                 requestUrlSet.add(we.getAttribute("href"));
                             }
                         }
+                        if(beforeSetCount == requestUrlSet.size()){
+                            checkRetries++;
+                        }
+                        beforeSetCount = requestUrlSet.size();
                         driverCall().navigate().refresh();
                     }catch(Exception e){
                         driverCall().navigate().refresh();

@@ -57,6 +57,7 @@ public class InstagramServiceImpl implements InstagramService{
     private String InstagramPw = "oshh1107";
     private String instagramLoginUrl = "https://www.instagram.com/accounts/login/";
     private int CONTENTS_SCRAP_MAX = 100;
+    private int CONTENTS_SCRAP_TRY_MAX = 10;
     /**
      * 태그 단위로 검색합니다.
      */
@@ -233,6 +234,7 @@ public class InstagramServiceImpl implements InstagramService{
         hashMap.put("title",    title);
         hashMap.put("status",   true);
         log("<PROCESS> JSONObject Allocated : " + url);
+        log(hashMap);
         return hashMapToJsonObject(hashMap);
     }
 
@@ -301,6 +303,7 @@ public class InstagramServiceImpl implements InstagramService{
             hashMap.put("title",    title);
             hashMap.put("status",   true);
             log("<PROCESS> JSONObject[comment] Allocated : " + url);
+            log(hashMap);
             jsonArray.add(hashMapToJsonObject(hashMap));
         }
         return jsonArray;
@@ -346,11 +349,13 @@ public class InstagramServiceImpl implements InstagramService{
         boolean success     = false;
         int retries         = 0;
         long currentDate    = 0;
+        int checkRetries    = 0;
+        int beforeSetCount  = 0;
         while (!success && retries < maxTryCount) {
             try {
-                while(requestUrlSet.size() < CONTENTS_SCRAP_MAX){
+                while(requestUrlSet.size() < CONTENTS_SCRAP_MAX && checkRetries < CONTENTS_SCRAP_TRY_MAX){
                     try{
-                        log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size());
+                        log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size() + " / request retry count : " + checkRetries);
                         currentDate = new Date().getTime();
                         while (new Date().getTime() < currentDate + DRIVER_TIME_OUT) { 
                             Thread.sleep(1000);
@@ -361,6 +366,10 @@ public class InstagramServiceImpl implements InstagramService{
                         for(WebElement we : targetTagWebElementList){
                             requestUrlSet.add(we.getAttribute("href"));
                         }
+                        if(beforeSetCount == requestUrlSet.size()){
+                            checkRetries++;
+                        }
+                        beforeSetCount = requestUrlSet.size();
                     }catch(Exception e){
                         driverCall().navigate().refresh();
                         continue;
