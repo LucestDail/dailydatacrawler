@@ -234,7 +234,6 @@ public class InstagramServiceImpl implements InstagramService{
         hashMap.put("title",    title);
         hashMap.put("status",   true);
         log("<PROCESS> JSONObject Allocated : " + url);
-        log(hashMap);
         return hashMapToJsonObject(hashMap);
     }
 
@@ -303,7 +302,6 @@ public class InstagramServiceImpl implements InstagramService{
             hashMap.put("title",    title);
             hashMap.put("status",   true);
             log("<PROCESS> JSONObject[comment] Allocated : " + url);
-            log(hashMap);
             jsonArray.add(hashMapToJsonObject(hashMap));
         }
         return jsonArray;
