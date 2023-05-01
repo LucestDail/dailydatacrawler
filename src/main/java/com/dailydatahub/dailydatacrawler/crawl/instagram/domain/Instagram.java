@@ -1,6 +1,7 @@
 package com.dailydatahub.dailydatacrawler.crawl.instagram.domain;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.json.simple.JSONObject;
 
@@ -115,18 +116,17 @@ public class Instagram extends BaseTimeEntity{
 
     public Instagram toEntity(JSONObject instagramJsonObject) {
         Instagram instagram = new Instagram();
-        instagram.setId(Long.parseLong(instagramJsonObject.containsKey("id") ? instagramJsonObject.get("id").toString(): ""));
         instagram.set_id(instagramJsonObject.containsKey("_id") ? instagramJsonObject.get("_id").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("snsId") ? instagramJsonObject.get("snsId").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("url") ? instagramJsonObject.get("url").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("category") ? instagramJsonObject.get("category").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("press") ? instagramJsonObject.get("press").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("title") ? instagramJsonObject.get("title").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("author") ? instagramJsonObject.get("author").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("content") ? instagramJsonObject.get("content").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("status") ? instagramJsonObject.get("status").toString() : "");
-        instagram.set_id(instagramJsonObject.containsKey("regDate") ? instagramJsonObject.get("regDate").toString() : "");
-        return instagram;
+        instagram.setSnsId(instagramJsonObject.containsKey("snsId") ? instagramJsonObject.get("snsId").toString() : "");
+        instagram.setUrl(instagramJsonObject.containsKey("url") ? instagramJsonObject.get("url").toString() : "");
+        instagram.setCategory(instagramJsonObject.containsKey("category") ? instagramJsonObject.get("category").toString() : "");
+        instagram.setPress(instagramJsonObject.containsKey("press") ? instagramJsonObject.get("press").toString() : "");
+        instagram.setTitle(instagramJsonObject.containsKey("title") ? instagramJsonObject.get("title").toString() : "");
+        instagram.setAuthor(instagramJsonObject.containsKey("author") ? instagramJsonObject.get("author").toString() : "");
+        instagram.setContent(instagramJsonObject.containsKey("content") ? instagramJsonObject.get("content").toString() : "");
+        instagram.setStatus(instagramJsonObject.containsKey("status") ? instagramJsonObject.get("status").toString() : "");
+        instagram.setRegDate(instagramJsonObject.containsKey("regDate") ? ZonedDateTime.parse(instagramJsonObject.get("regDate").toString()).toLocalDateTime() : null);
+        return new Instagram().toEntity(instagram);
     }
 
     public JSONObject toJson(){

@@ -61,6 +61,22 @@ public class InstagramController {
 
     }
 
+/**
+     * get Instagram get all of current explore tab
+     * 
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/exploreSave", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONArray requestExploreSave() throws Exception {
+        return service.exploreSave();
+
+    }
+
+    //requestExploreSave
+
     /**
      * get all list of instagram crawl data
      */

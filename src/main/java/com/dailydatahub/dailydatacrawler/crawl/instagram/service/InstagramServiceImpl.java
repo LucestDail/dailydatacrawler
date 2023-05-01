@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.dailydatahub.dailydatacrawler.crawl.instagram.dao.repositorty.InstagramRepository;
+import com.dailydatahub.dailydatacrawler.crawl.instagram.domain.Instagram;
 import com.dailydatahub.dailydatacrawler.module.FileComponent;
 import com.dailydatahub.dailydatacrawler.module.JsonComponent;
 import com.dailydatahub.dailydatacrawler.module.MD5Component;
@@ -32,6 +34,9 @@ public class InstagramServiceImpl implements InstagramService{
 
     @Autowired
     public FileComponent fileComponent;
+
+    @Autowired
+    private InstagramRepository instagramRepository;
 
     @Autowired
     public MD5Component md5;
@@ -75,6 +80,14 @@ public class InstagramServiceImpl implements InstagramService{
     }
 
     /**
+     * get all of data from instagram explore tab
+     */
+    @Override
+    public JSONArray exploreSave() throws Exception {
+        return requestInterface("exploreSave", null);
+    }
+
+    /**
      * 검색 타입에 키워드를 같이 검색하여 검색 결과를 반환합니다.
      * @param requestType
      * @param keyword
@@ -87,7 +100,10 @@ public class InstagramServiceImpl implements InstagramService{
         switch(requestType){
             case "tags":array = requestTagSearch(keyword);
                 break;
-            case "explore":array = requestExplore();
+            case "explore":array = requestExploreSave();
+                break;
+            case "exploreSave":
+                requestExploreSave();
                 break;
             default:
                 break;
@@ -96,7 +112,7 @@ public class InstagramServiceImpl implements InstagramService{
     }
 
     /**
-     * (tag) 키워드 정보로 검색하여 반환합니다.
+     * (tag) 무작위 정보를 검색하여 반환합니다.
      * @param jsonObject
      * @return JSONObject
      * @throws Exception
@@ -110,6 +126,7 @@ public class InstagramServiceImpl implements InstagramService{
         try{
             driverRequestAndWait(tagUrl+exploreUri);
             requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
+            log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size() + " >>> request start ");
         }catch(Exception e){
             e.printStackTrace();
             log("<EXCEPTION> can not request and wait process");
@@ -133,6 +150,55 @@ public class InstagramServiceImpl implements InstagramService{
         fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + "explore");
         fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + "explore");
         return array;
+    }
+
+/**
+     * (tag) 무작위 정보를 검색하여 반환합니다.
+     * @param jsonObject
+     * @return JSONObject
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    private JSONArray requestExploreSave() throws Exception{
+        log("<PROCESS> access to content list page >>> " + tagUrl + exploreUri);
+
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+        
+        try{
+            driverRequestAndWait(tagUrl+exploreUri);
+            requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
+            log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size() + " >>> request start ");
+        }catch(Exception e){
+            e.printStackTrace();
+            log("<EXCEPTION> can not request and wait process");
+            return null;
+        }
+
+        JSONArray array = new JSONArray();
+        JSONArray arrayComment = new JSONArray();
+
+        for(String requestUrl : requestUrlSet){
+            try{
+                driverRequestAndWait(requestUrl);
+                array.add(requestTagSearchDetail(requestUrl, "explore"));
+                arrayComment = scrapCommentList(arrayComment, requestUrl, "explore");
+            }catch(Exception e){
+                log("exception : " + requestUrl);
+                continue;
+            }
+        }
+        saveInstagram(array);
+        saveInstagram(arrayComment);
+        fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + "explore");
+        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + "explore");
+        return array;
+    }
+
+    private void saveInstagram(JSONArray jsonArray) throws Exception{
+        Instagram instagram = new Instagram();
+        for(Object jsonObject: jsonArray){
+            instagramRepository.save(instagram.toEntity((JSONObject)jsonObject));
+        }
     }
 
     
