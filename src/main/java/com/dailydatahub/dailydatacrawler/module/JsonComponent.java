@@ -62,7 +62,7 @@ public class JsonComponent {
      * @return
      * @throws Exception
      */
-    public static List<Object> toList(JSONArray array) throws Exception {
+    public static List<? extends Object> toList(JSONArray array) throws Exception {
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < array.size(); i++) {
             Object value = array.get(i);

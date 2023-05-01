@@ -299,6 +299,8 @@ public class TwitterServiceImpl implements Twitterservice{
                         }
                         if(beforeSetCount == requestUrlSet.size()){
                             checkRetries++;
+                        }else{
+                            checkRetries = 0;
                         }
                         beforeSetCount = requestUrlSet.size();
                         driverCall().navigate().refresh();

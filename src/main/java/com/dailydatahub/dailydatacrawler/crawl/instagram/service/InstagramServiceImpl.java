@@ -366,6 +366,8 @@ public class InstagramServiceImpl implements InstagramService{
                         }
                         if(beforeSetCount == requestUrlSet.size()){
                             checkRetries++;
+                        }else{
+                            checkRetries = 0;
                         }
                         beforeSetCount = requestUrlSet.size();
                     }catch(Exception e){
