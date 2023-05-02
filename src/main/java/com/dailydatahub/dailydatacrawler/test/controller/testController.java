@@ -67,5 +67,14 @@ public class testController {
     public JSONObject deleteMethod(JSONObject jsonRequestObject) throws Exception {
         return seleniumService.deleteData(jsonRequestObject);
     }
+
+    /**
+     * hangul test request from my childhood friend, jang
+     */
+    @RequestMapping(value = "/jang", method = RequestMethod.GET)
+    @ResponseBody
+    public String hangulTest() throws Exception{
+        return "";
+    }
     
 }

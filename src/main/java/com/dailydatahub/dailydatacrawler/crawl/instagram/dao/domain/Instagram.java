@@ -1,4 +1,4 @@
-package com.dailydatahub.dailydatacrawler.crawl.instagram.domain;
+package com.dailydatahub.dailydatacrawler.crawl.instagram.dao.domain;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
