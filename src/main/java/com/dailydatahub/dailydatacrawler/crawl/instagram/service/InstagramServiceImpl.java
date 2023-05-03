@@ -152,7 +152,7 @@ public class InstagramServiceImpl implements InstagramService{
         return array;
     }
 
-/**
+    /**
      * (tag) 무작위 정보를 검색하여 반환합니다.
      * @param jsonObject
      * @return JSONObject

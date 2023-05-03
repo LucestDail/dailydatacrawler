@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.dailydatahub.dailydatacrawler.crawl.twitter.dao.domain.Twitter;
+import com.dailydatahub.dailydatacrawler.crawl.twitter.dao.repository.TwitterRepository;
 import com.dailydatahub.dailydatacrawler.module.FileComponent;
 import com.dailydatahub.dailydatacrawler.module.JsonComponent;
 import com.dailydatahub.dailydatacrawler.module.MD5Component;
@@ -35,6 +37,9 @@ public class TwitterServiceImpl implements Twitterservice{
 
     @Autowired
     public MD5Component md5;
+
+    @Autowired
+    private TwitterRepository twitterRepository;
 
     @Value("${external.twitter.search.url}")
     private String searchUrl;
@@ -73,6 +78,14 @@ public class TwitterServiceImpl implements Twitterservice{
     }
 
     /**
+     * get all of data from twitter explore tab
+     */
+    @Override
+    public JSONArray exploreSave() throws Exception {
+        return requestInterface("exploreSave", null);
+    }
+
+    /**
      * 검색 타입에 키워드를 같이 검색하여 검색 결과를 반환합니다.
      * @param requestType
      * @param keyword
@@ -85,6 +98,9 @@ public class TwitterServiceImpl implements Twitterservice{
             case "search":array = requestWordSearch(keyword);
                 break;
             case "explore":array = requestExplore();
+                break;
+            case "exploreSave":
+                requestExploreSave();
                 break;
             default:
                 break;
@@ -160,6 +176,52 @@ public class TwitterServiceImpl implements Twitterservice{
 
         fileComponent.exportJson(array, crawlerJsonSavePath, TWITTER + "_" + "explore");
         return array;
+    }
+
+    /**
+     * (tag) 무작위 정보를 검색하여 반환합니다.
+     * @param jsonObject
+     * @return JSONObject
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    private JSONArray requestExploreSave() throws Exception{
+        log("<PROCESS> access to content list page >>> " + searchUrl + exploreUri);
+
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+        
+        try{
+            driverRequestAndWait(searchUrl+exploreUri);
+            requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
+            log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size() + " >>> request start ");
+        }catch(Exception e){
+            e.printStackTrace();
+            log("<EXCEPTION> can not request and wait process");
+            return null;
+        }
+
+        JSONArray array = new JSONArray();
+        JSONArray arrayComment = new JSONArray();
+
+        for(String requestUrl : requestUrlSet){
+            try{
+                driverRequestAndWait(requestUrl);
+                array.add(requestWordSearchDetail(requestUrl, "explore"));
+            }catch(Exception e){
+                log("exception : " + requestUrl);
+                continue;
+            }
+        }
+        saveTwitter(array);
+        fileComponent.exportJson(array, crawlerJsonSavePath, TWITTER + "_" + "explore");
+        return array;
+    }
+
+    private void saveTwitter(JSONArray jsonArray) throws Exception{
+        Twitter twitter = new Twitter();
+        for(Object jsonObject: jsonArray){
+            twitterRepository.save(twitter.toEntity((JSONObject)jsonObject));
+        }
     }
 
     /**
