@@ -220,7 +220,12 @@ public class TwitterServiceImpl implements Twitterservice{
     private void saveTwitter(JSONArray jsonArray) throws Exception{
         Twitter twitter = new Twitter();
         for(Object jsonObject: jsonArray){
-            twitterRepository.save(twitter.toEntity((JSONObject)jsonObject));
+            try{
+                twitterRepository.save(twitter.toEntity((JSONObject)jsonObject));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            
         }
     }
 

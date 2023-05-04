@@ -52,7 +52,7 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
-            youtubeService.explore();
+            //youtubeService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -64,7 +64,7 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
-            twitterService.explore();
+            //twitterService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -76,7 +76,7 @@ public class ScheduledTasks {
             log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
         }
         try{
-            instagramService.explore();
+            //instagramService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -88,7 +88,7 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
         }
         try{
-            dcinsideService.explore();
+            //dcinsideService.explore();
         }catch(Exception e){
             e.printStackTrace();
         }

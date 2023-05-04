@@ -61,8 +61,8 @@ public class InstagramServiceImpl implements InstagramService{
     private String InstagramId = "oshhyosung";
     private String InstagramPw = "oshh1107";
     private String instagramLoginUrl = "https://www.instagram.com/accounts/login/";
-    private int CONTENTS_SCRAP_MAX = 100;
-    private int CONTENTS_SCRAP_TRY_MAX = 10;
+    private int CONTENTS_SCRAP_MAX = 1;
+    private int CONTENTS_SCRAP_TRY_MAX = 5;
     /**
      * 태그 단위로 검색합니다.
      */
@@ -197,7 +197,11 @@ public class InstagramServiceImpl implements InstagramService{
     private void saveInstagram(JSONArray jsonArray) throws Exception{
         Instagram instagram = new Instagram();
         for(Object jsonObject: jsonArray){
-            instagramRepository.save(instagram.toEntity((JSONObject)jsonObject));
+            try{
+                instagramRepository.save(instagram.toEntity((JSONObject)jsonObject));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

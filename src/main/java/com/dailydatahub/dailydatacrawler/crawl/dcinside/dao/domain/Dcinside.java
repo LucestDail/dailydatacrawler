@@ -1,7 +1,9 @@
 package com.dailydatahub.dailydatacrawler.crawl.dcinside.dao.domain;
 
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.json.simple.JSONObject;
 
@@ -56,7 +58,7 @@ public class Dcinside extends BaseTimeEntity{
     @Column(columnDefinition = "text", nullable = false)
 	private String status;
 
-	@Column(columnDefinition = "text", nullable = false)
+	@Column(columnDefinition = "text", nullable = true)
 	private LocalDateTime regDate;
 
 	@Builder
@@ -84,18 +86,18 @@ public class Dcinside extends BaseTimeEntity{
         this.regDate = regDate;
 	}
 
-	public Dcinside toEntity(Dcinside Dcinside) {
+	public Dcinside toEntity(Dcinside dcinside) {
         return Dcinside.builder()
-                ._id(Dcinside.get_id().isBlank() ? this._id : Dcinside.get_id())
-                .snsId(Dcinside.getSnsId().isBlank() ? this.snsId : Dcinside.getSnsId())
-                .url(Dcinside.getUrl().isBlank() ? this.url : Dcinside.getUrl())
-                .category(Dcinside.getCategory().isBlank() ? this.category : Dcinside.getCategory())
-                .press(Dcinside.getPress().isBlank() ? this.press : Dcinside.getPress())
-                .title(Dcinside.getTitle().isBlank() ? this.title : Dcinside.getTitle())
-                .author(Dcinside.getAuthor().isBlank() ? this.author : Dcinside.getAuthor())
-                .content(Dcinside.getContent().isBlank() ? this.content : Dcinside.getContent())
-                .status(Dcinside.getStatus().isBlank() ? this.status : Dcinside.getStatus())
-                .regDate(Dcinside.getRegDate() == null ? this.regDate : Dcinside.getRegDate())
+                ._id(dcinside.get_id().isBlank() ? this._id : dcinside.get_id())
+                .snsId(dcinside.getSnsId().isBlank() ? this.snsId : dcinside.getSnsId())
+                .url(dcinside.getUrl().isBlank() ? this.url : dcinside.getUrl())
+                .category(dcinside.getCategory().isBlank() ? this.category : dcinside.getCategory())
+                .press(dcinside.getPress().isBlank() ? this.press : dcinside.getPress())
+                .title(dcinside.getTitle().isBlank() ? this.title : dcinside.getTitle())
+                .author(dcinside.getAuthor().isBlank() ? this.author : dcinside.getAuthor())
+                .content(dcinside.getContent().isBlank() ? this.content : dcinside.getContent())
+                .status(dcinside.getStatus().isBlank() ? this.status : dcinside.getStatus())
+                .regDate(dcinside.getRegDate() == null ? this.regDate : dcinside.getRegDate())
 				.build();
     }
 
@@ -114,34 +116,39 @@ public class Dcinside extends BaseTimeEntity{
                 .build();
     }
 
-    public Dcinside toEntity(JSONObject DcinsideJsonObject) {
-        Dcinside Dcinside = new Dcinside();
-        Dcinside.set_id(DcinsideJsonObject.containsKey("_id") ? DcinsideJsonObject.get("_id").toString() : "");
-        Dcinside.setSnsId(DcinsideJsonObject.containsKey("snsId") ? DcinsideJsonObject.get("snsId").toString() : "");
-        Dcinside.setUrl(DcinsideJsonObject.containsKey("url") ? DcinsideJsonObject.get("url").toString() : "");
-        Dcinside.setCategory(DcinsideJsonObject.containsKey("category") ? DcinsideJsonObject.get("category").toString() : "");
-        Dcinside.setPress(DcinsideJsonObject.containsKey("press") ? DcinsideJsonObject.get("press").toString() : "");
-        Dcinside.setTitle(DcinsideJsonObject.containsKey("title") ? DcinsideJsonObject.get("title").toString() : "");
-        Dcinside.setAuthor(DcinsideJsonObject.containsKey("author") ? DcinsideJsonObject.get("author").toString() : "");
-        Dcinside.setContent(DcinsideJsonObject.containsKey("content") ? DcinsideJsonObject.get("content").toString() : "");
-        Dcinside.setStatus(DcinsideJsonObject.containsKey("status") ? DcinsideJsonObject.get("status").toString() : "");
-        Dcinside.setRegDate(DcinsideJsonObject.containsKey("regDate") ? ZonedDateTime.parse(DcinsideJsonObject.get("regDate").toString()).toLocalDateTime() : null);
-        return new Dcinside().toEntity(Dcinside);
+    public Dcinside toEntity(JSONObject dcinsideJsonObject) {
+        Dcinside dcinside = new Dcinside();
+        dcinside.set_id(dcinsideJsonObject.containsKey("_id") ? dcinsideJsonObject.get("_id").toString() : "");
+        dcinside.setSnsId(dcinsideJsonObject.containsKey("snsId") ? dcinsideJsonObject.get("snsId").toString() : "");
+        dcinside.setUrl(dcinsideJsonObject.containsKey("url") ? dcinsideJsonObject.get("url").toString() : "");
+        dcinside.setCategory(dcinsideJsonObject.containsKey("category") ? dcinsideJsonObject.get("category").toString() : "");
+        dcinside.setPress(dcinsideJsonObject.containsKey("press") ? dcinsideJsonObject.get("press").toString() : "");
+        dcinside.setTitle(dcinsideJsonObject.containsKey("title") ? dcinsideJsonObject.get("title").toString() : "");
+        dcinside.setAuthor(dcinsideJsonObject.containsKey("author") ? dcinsideJsonObject.get("author").toString() : "");
+        dcinside.setContent(dcinsideJsonObject.containsKey("content") ? dcinsideJsonObject.get("content").toString() : "");
+        dcinside.setStatus(dcinsideJsonObject.containsKey("status") ? dcinsideJsonObject.get("status").toString() : "");
+        try{
+            dcinside.setRegDate(dcinsideJsonObject.containsKey("regDate") ? LocalDateTime.parse(dcinsideJsonObject.get("regDate").toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null);
+        }catch(Exception e){
+            dcinside.setRegDate(dcinsideJsonObject.containsKey("regDate") ? LocalDateTime.parse(dcinsideJsonObject.get("regDate").toString(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss")) : null);
+        }
+        //dcinside.setRegDate(dcinsideJsonObject.containsKey("regDate") ? LocalDateTime.parse(dcinsideJsonObject.get("regDate").toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null);
+        return new Dcinside().toEntity(dcinside);
     }
 
     public JSONObject toJson(){
-        JSONObject DcinsideJsonObject = new JSONObject();
-        DcinsideJsonObject.put("id", this.id);
-        DcinsideJsonObject.put("_id", this._id);
-        DcinsideJsonObject.put("snsId", this.snsId);
-        DcinsideJsonObject.put("url", this.url);
-        DcinsideJsonObject.put("category", this.category);
-        DcinsideJsonObject.put("press", this.press);
-        DcinsideJsonObject.put("title", this.title);
-        DcinsideJsonObject.put("author", this.author);
-        DcinsideJsonObject.put("content", this.content);
-        DcinsideJsonObject.put("status", this.status);
-        DcinsideJsonObject.put("regDate", this.regDate);
-        return DcinsideJsonObject;
+        JSONObject dcinsideJsonObject = new JSONObject();
+        dcinsideJsonObject.put("id", this.id);
+        dcinsideJsonObject.put("_id", this._id);
+        dcinsideJsonObject.put("snsId", this.snsId);
+        dcinsideJsonObject.put("url", this.url);
+        dcinsideJsonObject.put("category", this.category);
+        dcinsideJsonObject.put("press", this.press);
+        dcinsideJsonObject.put("title", this.title);
+        dcinsideJsonObject.put("author", this.author);
+        dcinsideJsonObject.put("content", this.content);
+        dcinsideJsonObject.put("status", this.status);
+        dcinsideJsonObject.put("regDate", this.regDate);
+        return dcinsideJsonObject;
     }
 }

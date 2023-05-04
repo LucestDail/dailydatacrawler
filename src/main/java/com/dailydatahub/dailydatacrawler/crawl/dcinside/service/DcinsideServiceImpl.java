@@ -1,5 +1,6 @@
 package com.dailydatahub.dailydatacrawler.crawl.dcinside.service;
 
+import java.time.Year;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -179,7 +180,12 @@ public class DcinsideServiceImpl implements DcinsideService {
     private void saveDcinside(JSONArray jsonArray) throws Exception{
         Dcinside dcinside = new Dcinside();
         for(Object jsonObject: jsonArray){
-            dcinsideRepository.save(dcinside.toEntity((JSONObject)jsonObject));
+            try{
+                dcinsideRepository.save(dcinside.toEntity((JSONObject)jsonObject));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            
         }
     }
 
@@ -326,7 +332,8 @@ public class DcinsideServiceImpl implements DcinsideService {
 
             // 작성 일시
             try{
-                regDate      = we.findElement(By.cssSelector("span.date_time")).getText();
+                regDate     = we.findElement(By.cssSelector("span.date_time")).getText();
+                regDate     = String.valueOf(Year.now().getValue()) + "." + regDate;
             }catch(Exception e){
                 log("<EXCEPTION> JSONObject Allocated fail from regdate : " + url);
             }

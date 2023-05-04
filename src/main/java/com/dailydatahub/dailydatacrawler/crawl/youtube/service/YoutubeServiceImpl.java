@@ -143,7 +143,7 @@ public class YoutubeServiceImpl implements YoutubeService{
             JSONObject jsonObject = (JSONObject) jsonArray.get(i);
             jsonCommentArray = requestKeywordSearchDetail(jsonCommentArray, ((JSONObject)jsonObject.get("id")).get("videoId").toString(),keyword);
         }
-        saveYoutube(jsonArray);
+        //saveYoutube(jsonArray);
         saveYoutube(jsonCommentArray);
         fileComponent.exportJson(jsonArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword);
         fileComponent.exportJson(jsonCommentArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword + "_COMMENT");
@@ -153,7 +153,12 @@ public class YoutubeServiceImpl implements YoutubeService{
     private void saveYoutube(JSONArray jsonArray) throws Exception{
         Youtube youtubu = new Youtube();
         for(Object jsonObject: jsonArray){
-            youtubeRepository.save(youtubu.toEntity((JSONObject)jsonObject));
+            try{
+                youtubeRepository.save(youtubu.toEntity((JSONObject)jsonObject));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            
         }
     }
 
