@@ -1,4 +1,4 @@
-package com.dailydatahub.dailydatacrawler.crawl.instagram.dao.repositorty;
+package com.dailydatahub.dailydatacrawler.crawl.instagram.dao.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

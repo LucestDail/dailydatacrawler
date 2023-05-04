@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.dailydatahub.dailydatacrawler.crawl.dcinside.dao.domain.Dcinside;
+import com.dailydatahub.dailydatacrawler.crawl.dcinside.dao.repository.DcinsideRepository;
 import com.dailydatahub.dailydatacrawler.module.FileComponent;
 import com.dailydatahub.dailydatacrawler.module.JsoupComponent;
 import com.dailydatahub.dailydatacrawler.module.MD5Component;
@@ -50,16 +52,19 @@ public class DcinsideServiceImpl implements DcinsideService {
     private String DCINSIDE = "DCINSIDE";
 
     @Autowired
-    public JsoupComponent jsoupComponent;
+    private JsoupComponent jsoupComponent;
 
     @Autowired
-    public SeleniumComponent seleniumComponent;
+    private SeleniumComponent seleniumComponent;
 
     @Autowired
-    public MD5Component md5;
+    private MD5Component md5;
 
     @Autowired
-    public FileComponent fileComponent;
+    private FileComponent fileComponent;
+
+    @Autowired
+    private DcinsideRepository dcinsideRepository;
 
     @Override
     public JSONArray search(String keyword) throws Exception {
@@ -130,6 +135,52 @@ public class DcinsideServiceImpl implements DcinsideService {
         fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + "explore");
         fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + "explore");
         return array;
+    }
+
+    /**
+     * get all of data from instagram explore tab
+     */
+    @Override
+    public JSONArray exploreSave() throws Exception {
+        // 대상 url 정보를 가져옵니다.
+        Set<String> requestUrlSet = new LinkedHashSet<String>();
+        try{
+            driverRequestAndWait(dcinsideBestUrl);
+            requestUrlSet = getUrlSetExplore(requestUrlSet);
+        }catch(Exception e){
+            e.printStackTrace();
+            log("<EXCEPTION> can not request and wait process");
+            return null;
+        }
+
+        JSONArray array = new JSONArray();
+        JSONArray arrayComment = new JSONArray();
+        for(String requestUrl : requestUrlSet){
+            try{
+                 // 대상 url 을 접근합니다.
+                driverRequestAndWait(requestUrl);
+                // 대상 본문 정보와 댓글 정보를 가져옵니다.
+                log("<PROCESS> scrap content");
+                array = scrapContentList(array, requestUrl, "explore");
+                log("<PROCESS> scrap comment list");
+                arrayComment = scrapCommentList(arrayComment, requestUrl, "explore");
+            }catch(Exception e){
+                log("exception : " + requestUrl);
+                continue;
+            }
+        }
+        saveDcinside(array);
+        saveDcinside(arrayComment);
+        fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + "explore");
+        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + "explore");
+        return array;
+    }
+
+    private void saveDcinside(JSONArray jsonArray) throws Exception{
+        Dcinside dcinside = new Dcinside();
+        for(Object jsonObject: jsonArray){
+            dcinsideRepository.save(dcinside.toEntity((JSONObject)jsonObject));
+        }
     }
 
     /**

@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dailydatahub.dailydatacrawler.crawl.instagram.dao.domain.Instagram;
-import com.dailydatahub.dailydatacrawler.crawl.instagram.dao.repositorty.InstagramRepository;
+import com.dailydatahub.dailydatacrawler.crawl.instagram.dao.repository.InstagramRepository;
 import com.dailydatahub.dailydatacrawler.module.FileComponent;
 import com.dailydatahub.dailydatacrawler.module.JsonComponent;
 import com.dailydatahub.dailydatacrawler.module.MD5Component;

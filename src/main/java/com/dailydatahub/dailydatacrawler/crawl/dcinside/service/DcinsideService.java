@@ -6,4 +6,6 @@ public interface DcinsideService {
     public JSONArray search(String keyword) throws Exception;
 
     public JSONArray explore() throws Exception;
+
+    public JSONArray exploreSave() throws Exception;
 }

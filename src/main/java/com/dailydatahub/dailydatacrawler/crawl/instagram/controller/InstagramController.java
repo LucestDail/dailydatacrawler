@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.dailydatahub.dailydatacrawler.crawl.instagram.dao.domain.Instagram;
-import com.dailydatahub.dailydatacrawler.crawl.instagram.dao.repositorty.InstagramRepository;
+import com.dailydatahub.dailydatacrawler.crawl.instagram.dao.repository.InstagramRepository;
 import com.dailydatahub.dailydatacrawler.crawl.instagram.service.InstagramService;
 
 import lombok.RequiredArgsConstructor;

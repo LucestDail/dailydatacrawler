@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.stereotype.Service;
 
+import com.dailydatahub.dailydatacrawler.crawl.youtube.dao.domain.Youtube;
+import com.dailydatahub.dailydatacrawler.crawl.youtube.dao.repository.YoutubeRepository;
 import com.dailydatahub.dailydatacrawler.module.AESCompoent;
 import com.dailydatahub.dailydatacrawler.module.FileComponent;
 import com.dailydatahub.dailydatacrawler.module.JsonComponent;
@@ -37,6 +39,9 @@ public class YoutubeServiceImpl implements YoutubeService{
 
     @Autowired
     public MD5Component md5;
+
+    @Autowired
+    private YoutubeRepository youtubeRepository;
 
     @Value("${external.youtube.url}")
     private String youtubeUrl;
@@ -84,6 +89,14 @@ public class YoutubeServiceImpl implements YoutubeService{
     }
 
     /**
+     * get all of data from instagram explore tab
+     */
+    @Override
+    public JSONArray exploreSave() throws Exception {
+        return requestInterface("exploreSave", null);
+    }
+
+    /**
      * 검검색 결과를 반환합니다.
      * @param requestType
      * @param keyword
@@ -99,10 +112,49 @@ public class YoutubeServiceImpl implements YoutubeService{
                 break;
             case "exploreCount":array = requestKeywordSearchCount();
                 break;
+            case "exploreSave":
+                requestExploreSave();
+                break;
             default:
                 break;
         }
         return array;
+    }
+
+
+    private JSONArray requestExploreSave() throws Exception{
+        // build url
+        String keyword = null;
+        String requestUrl = youtubeUrl + searchUri + "?maxResults=50&type=video&q=" + keyword + "&key=" + aes.decryptApiKey(API_KEY);
+        if(keyword == null){
+            requestUrl = youtubeUrl + searchUri + "?maxResults=50&type=video&key=" + aes.decryptApiKey(API_KEY);
+            keyword="explore";
+        }
+        URI uri = UriComponentsBuilder
+                .fromUriString(requestUrl)
+                .encode()
+                .build()
+                .toUri();
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(RestComponent.getRequest(uri));
+        JSONArray jsonArray = (JSONArray)parser.parse(json.get("items").toString());
+        JSONArray jsonCommentArray = new JSONArray();
+        for(int i = 0; i < jsonArray.size(); i++){
+            JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+            jsonCommentArray = requestKeywordSearchDetail(jsonCommentArray, ((JSONObject)jsonObject.get("id")).get("videoId").toString(),keyword);
+        }
+        saveYoutube(jsonArray);
+        saveYoutube(jsonCommentArray);
+        fileComponent.exportJson(jsonArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword);
+        fileComponent.exportJson(jsonCommentArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword + "_COMMENT");
+        return jsonArray;
+    }
+
+    private void saveYoutube(JSONArray jsonArray) throws Exception{
+        Youtube youtubu = new Youtube();
+        for(Object jsonObject: jsonArray){
+            youtubeRepository.save(youtubu.toEntity((JSONObject)jsonObject));
+        }
     }
 
     /**
