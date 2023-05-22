@@ -10,26 +10,26 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-// @SpringBootApplication
-// @EnableScheduling
+@SpringBootApplication
+@EnableScheduling
 public class BatchApplication implements CommandLineRunner{
 
-    // @Autowired
-    // private JobLauncher jobLauncher;
+    @Autowired
+    private JobLauncher jobLauncher;
 
-    // @Autowired
-    // private Job job;
+    @Autowired
+    private Job job;
 
-    // public static void main(String[] args) {
-    //     SpringApplication.run(BatchApplication.class, args);
-    // }
+    public static void main(String[] args) {
+        SpringApplication.run(BatchApplication.class, args);
+    }
 
-    // @Override
-    // public void run(String[] args) throws Exception{
-    //     JobParameters jobParameters = new JobParametersBuilder()
-    //                                     .addLong("time", System.currentTimeMillis())
-    //                                     .toJobParameters();
-    //     jobLauncher.run(job, jobParameters);
-    // }
+    @Override
+    public void run(String[] args) throws Exception{
+        JobParameters jobParameters = new JobParametersBuilder()
+                                        .addLong("time", System.currentTimeMillis())
+                                        .toJobParameters();
+        jobLauncher.run(job, jobParameters);
+    }
     
 }
