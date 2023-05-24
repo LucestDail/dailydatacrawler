@@ -145,8 +145,8 @@ public class YoutubeServiceImpl implements YoutubeService{
         }
         //saveYoutube(jsonArray);
         saveYoutube(jsonCommentArray);
-        fileComponent.exportJson(jsonArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword);
-        fileComponent.exportJson(jsonCommentArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword + "_COMMENT");
+        //fileComponent.exportJson(jsonArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword);
+        //fileComponent.exportJson(jsonCommentArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword + "_COMMENT");
         return jsonArray;
     }
 
@@ -211,8 +211,10 @@ public class YoutubeServiceImpl implements YoutubeService{
             JSONObject jsonObject = (JSONObject) jsonArray.get(i);
             jsonCommentArray = requestKeywordSearchDetail(jsonCommentArray, ((JSONObject)jsonObject.get("id")).get("videoId").toString(),keyword);
         }
-        fileComponent.exportJson(jsonArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword);
-        fileComponent.exportJson(jsonCommentArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword + "_COMMENT");
+        //saveYoutube(jsonArray);
+        saveYoutube(jsonCommentArray);
+        //fileComponent.exportJson(jsonArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword);
+        //fileComponent.exportJson(jsonCommentArray, crawlerJsonSavePath, YOUTUBE + "_" + keyword + "_COMMENT");
         return jsonArray;
     }
 

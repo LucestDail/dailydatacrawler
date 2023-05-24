@@ -98,8 +98,10 @@ public class DcinsideServiceImpl implements DcinsideService {
                 continue;
             }
         }
-        fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + keyword);
-        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + keyword);
+        saveDcinside(array);
+        saveDcinside(arrayComment);
+        // fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + keyword);
+        // fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + keyword);
         return array;
     }
 

@@ -127,18 +127,20 @@ public class TwitterServiceImpl implements Twitterservice{
             return null;
         }
 
+
         JSONArray array = new JSONArray();
 
         for(String requestUrl : requestUrlSet){
             try{
-                array.add(requestWordSearchDetail(requestUrl, keyword));
+                driverRequestAndWait(requestUrl);
+                array.add(requestWordSearchDetail(requestUrl, "explore"));
             }catch(Exception e){
                 log("exception : " + requestUrl);
                 continue;
             }
         }
+        saveTwitter(array);
 
-        fileComponent.exportJson(array, crawlerJsonSavePath, TWITTER + "_" + keyword);
         return array;
     }
 
@@ -201,7 +203,6 @@ public class TwitterServiceImpl implements Twitterservice{
         }
 
         JSONArray array = new JSONArray();
-        JSONArray arrayComment = new JSONArray();
 
         for(String requestUrl : requestUrlSet){
             try{
@@ -213,7 +214,7 @@ public class TwitterServiceImpl implements Twitterservice{
             }
         }
         saveTwitter(array);
-        fileComponent.exportJson(array, crawlerJsonSavePath, TWITTER + "_" + "explore");
+
         return array;
     }
 

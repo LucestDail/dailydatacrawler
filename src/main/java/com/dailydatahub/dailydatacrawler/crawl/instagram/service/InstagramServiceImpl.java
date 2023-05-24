@@ -236,9 +236,10 @@ public class InstagramServiceImpl implements InstagramService{
                 continue;
             }
         }
-        
-        fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + keyword);
-        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + keyword);
+        saveInstagram(array);
+        saveInstagram(arrayComment);
+        //fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + keyword);
+        //fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + keyword);
         return array;
     }
 
