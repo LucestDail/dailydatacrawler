@@ -74,7 +74,7 @@ public class DcinsideServiceImpl implements DcinsideService {
         // 대상 url 정보를 가져옵니다.
         Set<String> requestUrlSet = new LinkedHashSet<String>();
         try{
-            driverRequestAndWait(dcinsideBestUrl);
+            driverRequestAndWait(dcinsideUrl + keyword);
             requestUrlSet = getUrlSetSearch(requestUrlSet);
         }catch(Exception e){
             e.printStackTrace();

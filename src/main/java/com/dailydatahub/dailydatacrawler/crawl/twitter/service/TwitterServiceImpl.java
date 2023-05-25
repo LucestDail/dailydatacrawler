@@ -60,6 +60,9 @@ public class TwitterServiceImpl implements Twitterservice{
     private long DRIVER_TIME_OUT=5000l;
     private int CONTENTS_SCRAP_MAX = 100;
     private int CONTENTS_SCRAP_TRY_MAX = 10;
+    private String twitterId = "hyocrawlsu60444";
+    private String twitterPw = "sungcrawlhyo";
+    private String twitterLoginUrl = "https://twitter.com/i/flow/login";
 
     /**
      * 태그 단위로 검색합니다.
@@ -116,7 +119,7 @@ public class TwitterServiceImpl implements Twitterservice{
      */
     @SuppressWarnings("unchecked")
     private JSONArray requestWordSearch(String keyword) throws Exception{
-        log("<PROCESS> access to content list page >>> " + searchUrl + exploreUri);
+        log("<PROCESS> access to content list page >>> " + searchUrl+searchUri+"?q="+keyword);
         Set<String> requestUrlSet = new LinkedHashSet<String>();
         try{
             driverRequestAndWait(searchUrl+searchUri+"?q="+keyword,DRIVER_TIME_OUT);
