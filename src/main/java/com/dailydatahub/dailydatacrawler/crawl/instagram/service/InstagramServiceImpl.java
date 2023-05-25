@@ -214,10 +214,14 @@ public class InstagramServiceImpl implements InstagramService{
      */
     @SuppressWarnings("unchecked")
     private JSONArray requestTagSearch(String keyword) throws Exception{
+
+        log("<PROCESS> access to content list page >>> " + tagUrl+tagUri+keyword);
+
         Set<String> requestUrlSet = new LinkedHashSet<String>();
         try{
             driverRequestAndWait(tagUrl+tagUri+keyword);
             requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
+            log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size() + " >>> request start ");
         }catch(Exception e){
             log("<EXCEPTION> can not request and wait process");
             return null;
@@ -238,8 +242,7 @@ public class InstagramServiceImpl implements InstagramService{
         }
         saveInstagram(array);
         saveInstagram(arrayComment);
-        //fileComponent.exportJson(array, crawlerJsonSavePath, INSTAGRAM + "_" + keyword);
-        //fileComponent.exportJson(arrayComment, crawlerJsonSavePath, INSTAGRAM + "_COMMENT_" + keyword);
+
         return array;
     }
 

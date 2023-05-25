@@ -100,8 +100,6 @@ public class DcinsideServiceImpl implements DcinsideService {
         }
         saveDcinside(array);
         saveDcinside(arrayComment);
-        // fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + keyword);
-        // fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + keyword);
         return array;
     }
 
@@ -135,8 +133,8 @@ public class DcinsideServiceImpl implements DcinsideService {
                 continue;
             }
         }
-        fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + "explore");
-        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + "explore");
+        saveDcinside(array);
+        saveDcinside(arrayComment);
         return array;
     }
 
@@ -174,8 +172,6 @@ public class DcinsideServiceImpl implements DcinsideService {
         }
         saveDcinside(array);
         saveDcinside(arrayComment);
-        fileComponent.exportJson(array, crawlerJsonSavePath, DCINSIDE + "_" + "explore");
-        fileComponent.exportJson(arrayComment, crawlerJsonSavePath, DCINSIDE + "_COMMENT_" + "explore");
         return array;
     }
 

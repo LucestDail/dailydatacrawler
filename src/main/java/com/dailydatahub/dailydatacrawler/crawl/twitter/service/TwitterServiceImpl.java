@@ -116,31 +116,28 @@ public class TwitterServiceImpl implements Twitterservice{
      */
     @SuppressWarnings("unchecked")
     private JSONArray requestWordSearch(String keyword) throws Exception{
-
+        log("<PROCESS> access to content list page >>> " + searchUrl + exploreUri);
         Set<String> requestUrlSet = new LinkedHashSet<String>();
-
         try{
             driverRequestAndWait(searchUrl+searchUri+"?q="+keyword,DRIVER_TIME_OUT);
             requestUrlSet = scrollDownRequestAndWaitAndGetUrl(requestUrlSet);
+            log("<PROCESS> current request URL Set Scraped Size : "+ requestUrlSet.size() + " >>> request start ");
         }catch(Exception e){
+            e.printStackTrace();
             log("<EXCEPTION> can not request and wait process");
             return null;
         }
-
-
         JSONArray array = new JSONArray();
-
         for(String requestUrl : requestUrlSet){
             try{
                 driverRequestAndWait(requestUrl);
-                array.add(requestWordSearchDetail(requestUrl, "explore"));
+                array.add(requestWordSearchDetail(requestUrl, keyword));
             }catch(Exception e){
                 log("exception : " + requestUrl);
                 continue;
             }
         }
         saveTwitter(array);
-
         return array;
     }
 
