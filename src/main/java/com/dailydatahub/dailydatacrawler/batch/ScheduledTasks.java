@@ -52,7 +52,7 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
-            youtubeService.exploreSave();
+            //youtubeService.exploreSave();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -64,13 +64,13 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
-            twitterService.exploreSave();
+            //twitterService.exploreSave();
         }catch(Exception e){
             e.printStackTrace();
         }
 	}
 
-    @Scheduled(cron="0 40 */3 * * *")
+    @Scheduled(cron="0 0 1-23/2 * * *")
 	public void instagramExplore(){
         if(Boolean.parseBoolean(logFlag)){
             log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
@@ -82,7 +82,7 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 0 */3 * * *")
+    @Scheduled(cron="0 0 */2 * * *")
 	public void dcinsideExplore(){
         if(Boolean.parseBoolean(logFlag)){
 		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
