@@ -27,24 +27,19 @@ public class SeleniumComponent {
     private WebDriver driver;
     private ChromeOptions options;
 
-    @Value("${selenium.headless}")
-    private String seleniumHeadlessFlag;
-
     public SeleniumComponent() {
         options = new ChromeOptions();
         options.addArguments("--lang=ko");
         options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
+        options.addArguments("--single-process");
         options.setCapability("ignoreProtectedModeSettings", true);
         options.addArguments("--remote-allow-origins=*");
-        if(Boolean.parseBoolean(seleniumHeadlessFlag)){
-            options.addArguments("--headless=new");
-        }
-        options.addArguments("start-maximized"); // https://stackoverflow.com/a/26283818/1689770
-        options.addArguments("enable-automation"); // https://stackoverflow.com/a/43840128/1689770
-        options.addArguments("--disable-dev-shm-usage"); //https://stackoverflow.com/a/50725918/1689770
-        options.addArguments("--disable-browser-side-navigation"); //https://stackoverflow.com/a/49123152/1689770
+        options.addArguments("--headless=new");
+        options.addArguments("start-maximized");
+        options.addArguments("enable-automation");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-browser-side-navigation");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--disable-extensions");
         options.addArguments("--dns-prefetch-disable");
