@@ -12,7 +12,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,6 @@ public class SeleniumComponent {
         options.addArguments("--lang=ko");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-gpu");
-        options.addArguments("--single-process");
         options.setCapability("ignoreProtectedModeSettings", true);
         options.addArguments("--remote-allow-origins=*");
         options.addArguments("--headless=new");
