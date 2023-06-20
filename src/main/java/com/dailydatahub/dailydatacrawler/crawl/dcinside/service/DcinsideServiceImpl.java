@@ -4,6 +4,7 @@ import java.time.Year;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.json.simple.JSONArray;
@@ -156,7 +157,10 @@ public class DcinsideServiceImpl implements DcinsideService {
 
         JSONArray array = new JSONArray();
         JSONArray arrayComment = new JSONArray();
-        for(String requestUrl : requestUrlSet){
+        Set<String> testSet = new LinkedHashSet<>();
+        Optional<String> optT = requestUrlSet.stream().findAny();
+        testSet.add(optT.get());
+        for(String requestUrl : testSet){
             try{
                  // 대상 url 을 접근합니다.
                 driverRequestAndWait(requestUrl);

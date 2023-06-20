@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,9 @@ public class SeleniumComponent {
     private WebDriver driver;
     private ChromeOptions options;
 
+    @Value("${selenium.headless}")
+    private String seleniumHeadlessFlag;
+
     public SeleniumComponent() {
         options = new ChromeOptions();
         options.addArguments("--lang=ko");
@@ -34,7 +38,9 @@ public class SeleniumComponent {
         options.addArguments("--disable-gpu");
         options.setCapability("ignoreProtectedModeSettings", true);
         options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--headless=new");
+        if(Boolean.parseBoolean(seleniumHeadlessFlag)){
+            options.addArguments("--headless=new");
+        }
         options.addArguments("start-maximized"); // https://stackoverflow.com/a/26283818/1689770
         options.addArguments("enable-automation"); // https://stackoverflow.com/a/43840128/1689770
         options.addArguments("--disable-dev-shm-usage"); //https://stackoverflow.com/a/50725918/1689770

@@ -33,10 +33,21 @@ public class ScheduledTasks {
 
     @Autowired
     private DcinsideService dcinsideService;
-
     
     @Value("${crawler.log.flag}")
     private String logFlag;
+
+    @Value("${crawler.dcinside.flag}")
+    private String dcinsideFlag;
+
+    @Value("${crawler.twitter.flag}")
+    private String twitterFlag;
+
+    @Value("${crawler.youtube.flag}")
+    private String youtubeFlag;
+
+    @Value("${crawler.instagram.flag}")
+    private String instagramFlag;
 
     @Scheduled(cron="0 * * * * *")
 	public void reportCurrentTime(){
@@ -52,7 +63,9 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> youtubeExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
-            //youtubeService.exploreSave();
+            if(Boolean.parseBoolean(youtubeFlag)){
+                youtubeService.exploreSave();
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -64,7 +77,9 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> twitterExplore Execute {}", dateFormat.format(new Date()));
          }
         try{
-            //twitterService.exploreSave();
+            if(Boolean.parseBoolean(twitterFlag)){
+                twitterService.exploreSave();
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -76,7 +91,9 @@ public class ScheduledTasks {
             log.info("<EXECUTION> instagramExplore Execute {}", dateFormat.format(new Date()));
         }
         try{
-            instagramService.exploreSave();
+            if(Boolean.parseBoolean(instagramFlag)){
+                instagramService.exploreSave();
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -88,7 +105,9 @@ public class ScheduledTasks {
 		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));
         }
         try{
-            dcinsideService.exploreSave();
+            if(Boolean.parseBoolean(dcinsideFlag)){
+                dcinsideService.exploreSave();
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
