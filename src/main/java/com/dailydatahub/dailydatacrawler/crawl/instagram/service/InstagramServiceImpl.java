@@ -61,8 +61,8 @@ public class InstagramServiceImpl implements InstagramService{
     private String InstagramId = "oshhyosung";
     private String InstagramPw = "oshh1107";
     private String instagramLoginUrl = "https://www.instagram.com/accounts/login/";
-    private int CONTENTS_SCRAP_MAX = 1;
-    private int CONTENTS_SCRAP_TRY_MAX = 5;
+    private int CONTENTS_SCRAP_MAX = 100;
+    private int CONTENTS_SCRAP_TRY_MAX = 10;
     /**
      * 태그 단위로 검색합니다.
      */
