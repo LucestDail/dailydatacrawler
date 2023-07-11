@@ -157,10 +157,7 @@ public class DcinsideServiceImpl implements DcinsideService {
 
         JSONArray array = new JSONArray();
         JSONArray arrayComment = new JSONArray();
-        Set<String> testSet = new LinkedHashSet<>();
-        Optional<String> optT = requestUrlSet.stream().findAny();
-        testSet.add(optT.get());
-        for(String requestUrl : testSet){
+        for(String requestUrl : requestUrlSet){
             try{
                  // 대상 url 을 접근합니다.
                 driverRequestAndWait(requestUrl);
