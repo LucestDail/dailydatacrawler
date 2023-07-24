@@ -49,7 +49,7 @@ public class ScheduledTasks {
     @Value("${crawler.instagram.flag}")
     private String instagramFlag;
 
-    @Scheduled(cron="* * * * * *")
+    @Scheduled(cron="0 * * * * *")
 	public void reportCurrentTime(){
         if(Boolean.parseBoolean(logFlag)){
             log.info("<REPORTING> {}", dateFormat.format(new Date()));
