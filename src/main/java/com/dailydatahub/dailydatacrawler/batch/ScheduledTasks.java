@@ -98,7 +98,7 @@ public class ScheduledTasks {
         }
 	}
 
-    @Scheduled(cron="0 0 * * * *")
+    @Scheduled(cron="0 */30 * * * *")
 	public void dcinsideExplore(){
         if(Boolean.parseBoolean(logFlag)){
 		    log.info("<EXECUTION> dcinsideExplore Execute {}", dateFormat.format(new Date()));

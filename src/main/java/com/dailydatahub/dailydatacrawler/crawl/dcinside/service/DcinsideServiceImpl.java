@@ -271,7 +271,6 @@ public class DcinsideServiceImpl implements DcinsideService {
         String regDate  =   mainArticle.findElement(By.className("gall_date")).getAttribute("title");
         String content  =   mainArticle.findElement(By.className("write_div")).getText();
         String title    =   mainArticle.findElement(By.className("title_subject")).getText();
-
         String authorIp = null;
         String authorNickName = null;
         String authorId   =  null;
@@ -298,6 +297,7 @@ public class DcinsideServiceImpl implements DcinsideService {
         hashMap.put("title",    title);
         hashMap.put("status",   true);
         log("<PROCESS> JSONObject Allocated : " + url);
+        System.out.println(content);
         return hashMapToJsonObject(hashMap);
     }
 
@@ -369,6 +369,7 @@ public class DcinsideServiceImpl implements DcinsideService {
             hashMap.put("title",    title);
             hashMap.put("status",   true);
             log("<PROCESS> JSONObject[comment] Allocated : " + url);
+            System.out.println(content);
             jsonArray.add(hashMapToJsonObject(hashMap));
         }
         return jsonArray;

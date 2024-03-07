@@ -23,6 +23,7 @@ public class SeleniumComponent {
     private static String SELENIUM_PATH_MAC_M1 = "external/selenium/chromedriver_mac64_arm64/chromedriver";
     private static String SELENIUM_PATH_LINUX = "external/selenium/chromedriver_linux64/chromedriver";
     private static String SELENIUM_PATH_WINDOWS = "external/selenium/chromedriver_win32/chromedriver.exe";
+    private static String SELENIUM_PATH_WINDOWS_64 = "external/selenium/chromedriver_win64/chromedriver.exe";
     private WebDriver driver;
     private ChromeOptions options;
 
@@ -42,11 +43,7 @@ public class SeleniumComponent {
         options.addArguments("--disable-extensions");
         options.addArguments("--dns-prefetch-disable");
         options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
-        driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
-        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
+        
         try {
             InputStream inputStream = new ClassPathResource(SELENIUM_PATH_JENKINS).getInputStream();
             File file = File.createTempFile("chromedriver", "");
@@ -59,8 +56,10 @@ public class SeleniumComponent {
             file.setExecutable(true, false);
             file.setWritable(true, false);
             System.setProperty(SELENIUM_ID, file.getPath());
+            driver = new ChromeDriver(options);
+            System.out.println("jenkins started");
         } catch (Exception eA) {
-            // eA.printStackTrace();
+            eA.printStackTrace();
            System.out.println("jenkins failed");
             try {
                 InputStream inputStream = new ClassPathResource(SELENIUM_PATH_LINUX).getInputStream();
@@ -74,8 +73,10 @@ public class SeleniumComponent {
                 file.setExecutable(true, false);
                 file.setWritable(true, false);
                 System.setProperty(SELENIUM_ID, file.getPath());
+                driver = new ChromeDriver(options);
+                System.out.println("linux started");
             } catch (Exception eB) {
-                // eB.printStackTrace();
+                eB.printStackTrace();
                 System.out.println("linux failed");
                 try {
                     InputStream inputStream = new ClassPathResource(SELENIUM_PATH_WINDOWS).getInputStream();
@@ -89,9 +90,11 @@ public class SeleniumComponent {
                     file.setExecutable(true, false);
                     file.setWritable(true, false);
                     System.setProperty(SELENIUM_ID, file.getPath());
+                    driver = new ChromeDriver(options);
+                    System.out.println("window32 started");
                 } catch (Exception eC) {
-                    // eC.printStackTrace();
-                    System.out.println("window failed");
+                    eC.printStackTrace();
+                    System.out.println("window32 failed");
                     try {
                         InputStream inputStream = new ClassPathResource(SELENIUM_PATH_MAC).getInputStream();
                         File file = File.createTempFile("chromedriver", "");
@@ -104,8 +107,10 @@ public class SeleniumComponent {
                         file.setExecutable(true, false);
                         file.setWritable(true, false);
                         System.setProperty(SELENIUM_ID, file.getPath());
+                        driver = new ChromeDriver(options);
+                        System.out.println("mac started");
                     } catch (Exception eD) {
-                        // eD.printStackTrace();
+                        eD.printStackTrace();
                         System.out.println("mac failed");
                         try {
                             InputStream inputStream = new ClassPathResource(SELENIUM_PATH_MAC_M1).getInputStream();
@@ -119,15 +124,39 @@ public class SeleniumComponent {
                             file.setExecutable(true, false);
                             file.setWritable(true, false);
                             System.setProperty(SELENIUM_ID, file.getPath());
+                            driver = new ChromeDriver(options);
+                            System.out.println("mac 64 started");
                         }catch(Exception eF){
-                            // eF.printStackTrace();
+                            eF.printStackTrace();
                             System.out.println("mac 64 failed");
+                            try {
+                                InputStream inputStream = new ClassPathResource(SELENIUM_PATH_WINDOWS_64).getInputStream();
+                                File file = File.createTempFile("chromedriver", "");
+                                try {
+                                    FileUtils.copyInputStreamToFile(inputStream,file);
+                                } finally {
+                                    IOUtils.closeQuietly(inputStream);
+                                }
+                                file.setReadable(true, false);
+                                file.setExecutable(true, false);
+                                file.setWritable(true, false);
+                                System.setProperty(SELENIUM_ID, file.getPath());
+                                driver = new ChromeDriver(options);
+                                System.out.println("windows 64 started");
+                            }catch(Exception eG){
+                                eG.printStackTrace();
+                                System.out.println("windows 64 failed");
+                            }
                         }
-                        
                     }
                 }
             }
         }
+        driver = new ChromeDriver(options);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
+        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
     }
 
     public String requestUrlByTag(String url, String elementName) {
