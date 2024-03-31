@@ -297,7 +297,7 @@ public class DcinsideServiceImpl implements DcinsideService {
         hashMap.put("title",    title);
         hashMap.put("status",   true);
         log("<PROCESS> JSONObject Allocated : " + url);
-        System.out.println(content);
+        // System.out.println(content);
         return hashMapToJsonObject(hashMap);
     }
 
@@ -369,7 +369,7 @@ public class DcinsideServiceImpl implements DcinsideService {
             hashMap.put("title",    title);
             hashMap.put("status",   true);
             log("<PROCESS> JSONObject[comment] Allocated : " + url);
-            System.out.println(content);
+            // System.out.println(content);
             jsonArray.add(hashMapToJsonObject(hashMap));
         }
         return jsonArray;
